@@ -12,6 +12,8 @@ export class Deforestation {
         this.fallenTrees = [];
         this.stumps = [];
         this.machinery = null;
+        this.burningTrees = [];
+        this.fireParticles = [];
 
         this.create();
     }
@@ -36,10 +38,15 @@ export class Deforestation {
 
         // Add warning sign
         this.createWarningSign(areaX + 10, areaZ + 5);
+
+        // Create burning trees
+        this.createBurningTrees(areaX, areaZ);
     }
 
     createStumps(baseX, baseZ) {
+        // Expanded stump positions for a larger, more visible deforestation area
         const stumpPositions = [
+            // Original positions
             { x: 0, z: 0 },
             { x: 3, z: 2 },
             { x: -2, z: 4 },
@@ -47,7 +54,22 @@ export class Deforestation {
             { x: -4, z: 1 },
             { x: 1, z: 5 },
             { x: 5, z: 3 },
-            { x: -3, z: -2 }
+            { x: -3, z: -2 },
+            // Additional stumps for larger cleared area
+            { x: 6, z: 0 },
+            { x: 7, z: -2 },
+            { x: 8, z: 1 },
+            { x: -5, z: 3 },
+            { x: -6, z: -1 },
+            { x: 2, z: -4 },
+            { x: -1, z: -5 },
+            { x: 5, z: -5 },
+            { x: 7, z: 4 },
+            { x: -4, z: 5 },
+            { x: 0, z: 7 },
+            { x: 3, z: 6 },
+            { x: -3, z: -4 },
+            { x: 6, z: 5 }
         ];
 
         stumpPositions.forEach(pos => {
@@ -107,7 +129,12 @@ export class Deforestation {
         const fallenPositions = [
             { x: 2, z: 0, rotation: 0.3 },
             { x: -1, z: 3, rotation: 1.2 },
-            { x: 4, z: 4, rotation: 2.5 }
+            { x: 4, z: 4, rotation: 2.5 },
+            // Additional fallen trees
+            { x: -4, z: -2, rotation: 0.8 },
+            { x: 6, z: 1, rotation: 1.8 },
+            { x: 0, z: 6, rotation: 3.0 },
+            { x: 7, z: -3, rotation: 2.2 }
         ];
 
         fallenPositions.forEach(pos => {
@@ -441,6 +468,83 @@ export class Deforestation {
         this.scene.add(sign);
     }
 
+    createBurningTrees(baseX, baseZ) {
+        // Positions for burning trees at the edge of deforestation
+        const burningPositions = [
+            { x: -8, z: 2 },
+            { x: -10, z: -3 },
+            { x: 10, z: 6 },
+            { x: -6, z: 5 }
+        ];
+
+        burningPositions.forEach(pos => {
+            const tree = this.createBurningTree();
+            tree.position.set(baseX + pos.x, 0, baseZ + pos.z);
+            tree.rotation.y = Math.random() * Math.PI * 2;
+            this.scene.add(tree);
+            this.burningTrees.push(tree);
+        });
+    }
+
+    createBurningTree() {
+        const tree = new THREE.Group();
+
+        // Charred trunk
+        const trunkGeometry = new THREE.CylinderGeometry(0.3, 0.5, 4, 8);
+        const trunkMaterial = new THREE.MeshStandardMaterial({
+            color: 0x1a1a1a,
+            roughness: 1
+        });
+        const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+        trunk.position.y = 2;
+        tree.add(trunk);
+
+        // Burning foliage (orange/red)
+        const foliageGeometry = new THREE.ConeGeometry(1.5, 3, 8);
+        const foliageMaterial = new THREE.MeshStandardMaterial({
+            color: 0x8b2500,
+            emissive: 0xff4400,
+            emissiveIntensity: 0.5,
+            roughness: 0.8
+        });
+        const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+        foliage.position.y = 4;
+        tree.add(foliage);
+
+        // Fire particles
+        const fireGroup = new THREE.Group();
+        fireGroup.name = 'fireParticles';
+
+        for (let i = 0; i < 15; i++) {
+            const particleGeometry = new THREE.SphereGeometry(0.1 + Math.random() * 0.15, 6, 6);
+            const particleMaterial = new THREE.MeshBasicMaterial({
+                color: Math.random() > 0.5 ? 0xff6600 : 0xffcc00,
+                transparent: true,
+                opacity: 0.8
+            });
+            const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+            particle.position.set(
+                (Math.random() - 0.5) * 1.5,
+                3 + Math.random() * 3,
+                (Math.random() - 0.5) * 1.5
+            );
+            particle.userData = {
+                baseY: particle.position.y,
+                speed: 1 + Math.random() * 2,
+                phase: Math.random() * Math.PI * 2
+            };
+            fireGroup.add(particle);
+        }
+        tree.add(fireGroup);
+
+        // Point light for fire glow
+        const fireLight = new THREE.PointLight(0xff4400, 2, 8);
+        fireLight.position.y = 4;
+        tree.add(fireLight);
+
+        return tree;
+    }
+
     update(time) {
         // Animate loggers (simple idle animation)
         this.loggers.forEach((logger, index) => {
@@ -452,6 +556,23 @@ export class Deforestation {
             arms.forEach(arm => {
                 arm.rotation.x = -0.3 + Math.sin(time * 4 + index) * 0.2;
             });
+        });
+
+        // Animate fire particles
+        this.burningTrees.forEach(tree => {
+            const fireGroup = tree.getObjectByName('fireParticles');
+            if (fireGroup) {
+                fireGroup.children.forEach(particle => {
+                    const data = particle.userData;
+                    // Rising motion
+                    particle.position.y = data.baseY + Math.sin(time * data.speed + data.phase) * 0.5;
+                    // Flicker
+                    particle.material.opacity = 0.5 + Math.sin(time * data.speed * 3 + data.phase) * 0.3;
+                    // Scale pulse
+                    const scale = 0.8 + Math.sin(time * data.speed * 2 + data.phase) * 0.3;
+                    particle.scale.setScalar(scale);
+                });
+            }
         });
     }
 

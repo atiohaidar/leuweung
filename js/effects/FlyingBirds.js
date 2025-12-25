@@ -87,10 +87,10 @@ export class FlyingBirds {
             endZ: -250
         };
 
-        // Random starting position
+        // Random starting position - fly at camera level
         flock.position.set(
-            (Math.random() - 0.5) * 60,
-            10 + Math.random() * 20,
+            (Math.random() - 0.5) * 20,  // Closer to center
+            2 + Math.random() * 6,        // Lower height (camera is at Y:2-10)
             flock.userData.startZ
         );
 
@@ -132,8 +132,8 @@ export class FlyingBirds {
             // Reset flock when it goes too far
             if (flock.position.z < data.endZ) {
                 flock.position.set(
-                    (Math.random() - 0.5) * 60,
-                    10 + Math.random() * 20,
+                    (Math.random() - 0.5) * 20,
+                    2 + Math.random() * 6,
                     data.startZ
                 );
                 // Randomize direction slightly

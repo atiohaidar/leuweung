@@ -1,5 +1,6 @@
 /**
  * Points of Interest - Defines special locations in the forest
+ * Reads configuration from config.js for better maintainability
  * @module PointsOfInterest
  */
 
@@ -9,6 +10,7 @@ export class PointsOfInterest {
     constructor(sceneManager) {
         this.sceneManager = sceneManager;
         this.points = {};
+        this.poiConfig = CONFIG.pointsOfInterest || {};
 
         this.createGiantTree();
         this.createWildlifeArea();
@@ -16,6 +18,12 @@ export class PointsOfInterest {
     }
 
     createGiantTree() {
+        const config = this.poiConfig.giantTree || {
+            position: { x: -15, y: 0, z: -50 },
+            cameraPosition: { x: -8, y: 5, z: -40 },
+            lookAt: { x: -15, y: 10, z: -50 }
+        };
+
         const tree = new THREE.Group();
 
         // Giant trunk
@@ -31,11 +39,7 @@ export class PointsOfInterest {
         // Massive foliage layers
         const foliageColors = [0x1d5a2a, 0x2d6a3a, 0x3d7a4a, 0x1d4a2a, 0x2a5a3a];
         for (let i = 0; i < 5; i++) {
-            const foliageGeometry = new THREE.SphereGeometry(
-                8 - i * 1.2,
-                16,
-                16
-            );
+            const foliageGeometry = new THREE.SphereGeometry(8 - i * 1.2, 16, 16);
             const foliageMaterial = new THREE.MeshStandardMaterial({
                 color: foliageColors[i],
                 roughness: 0.8
@@ -65,7 +69,7 @@ export class PointsOfInterest {
             tree.add(root);
         }
 
-        tree.position.set(-15, 0, -50);
+        tree.position.set(config.position.x, config.position.y, config.position.z);
         this.sceneManager.add(tree);
 
         // Add glowing mushrooms around the giant tree
@@ -73,18 +77,84 @@ export class PointsOfInterest {
             const mushroom = this.createGlowingMushroom();
             const angle = (i / 12) * Math.PI * 2;
             mushroom.position.set(
-                -15 + Math.cos(angle) * (4 + Math.random() * 2),
+                config.position.x + Math.cos(angle) * (4 + Math.random() * 2),
                 0,
-                -50 + Math.sin(angle) * (4 + Math.random() * 2)
+                config.position.z + Math.sin(angle) * (4 + Math.random() * 2)
+            );
+            this.sceneManager.add(mushroom);
+        }
+
+        // Create second giant tree on the opposite side (so camera passes between them)
+        const tree2 = this.createGiantTreeMesh();
+        tree2.position.set(-config.position.x, config.position.y, config.position.z);
+        this.sceneManager.add(tree2);
+
+        // Mushrooms around second tree
+        for (let i = 0; i < 8; i++) {
+            const mushroom = this.createGlowingMushroom();
+            const angle = (i / 8) * Math.PI * 2;
+            mushroom.position.set(
+                -config.position.x + Math.cos(angle) * (4 + Math.random() * 2),
+                0,
+                config.position.z + Math.sin(angle) * (4 + Math.random() * 2)
             );
             this.sceneManager.add(mushroom);
         }
 
         this.points.giantTree = {
             object: tree,
-            cameraPosition: { x: -8, y: 5, z: -40 },
-            lookAt: { x: -15, y: 10, z: -50 }
+            cameraPosition: config.cameraPosition,
+            lookAt: config.lookAt
         };
+    }
+
+    createGiantTreeMesh() {
+        const tree = new THREE.Group();
+
+        // Giant trunk
+        const trunkGeometry = new THREE.CylinderGeometry(1.5, 2.5, 15, 12);
+        const trunkMaterial = new THREE.MeshStandardMaterial({
+            color: 0x5a4738,
+            roughness: 0.9
+        });
+        const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+        trunk.position.y = 7.5;
+        tree.add(trunk);
+
+        // Massive foliage layers
+        const foliageColors = [0x1d5a2a, 0x2d6a3a, 0x3d7a4a, 0x1d4a2a, 0x2a5a3a];
+        for (let i = 0; i < 5; i++) {
+            const foliageGeometry = new THREE.SphereGeometry(8 - i * 1.2, 16, 16);
+            const foliageMaterial = new THREE.MeshStandardMaterial({
+                color: foliageColors[i],
+                roughness: 0.8
+            });
+            const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+            foliage.position.y = 12 + i * 3;
+            foliage.scale.y = 0.6;
+            tree.add(foliage);
+        }
+
+        // Roots
+        for (let i = 0; i < 8; i++) {
+            const rootGeometry = new THREE.CylinderGeometry(0.3, 0.8, 4, 6);
+            const rootMaterial = new THREE.MeshStandardMaterial({
+                color: 0x4a3728,
+                roughness: 0.9
+            });
+            const root = new THREE.Mesh(rootGeometry, rootMaterial);
+            const angle = (i / 8) * Math.PI * 2;
+            root.position.set(
+                Math.cos(angle) * 2,
+                0,
+                Math.sin(angle) * 2
+            );
+            root.rotation.z = Math.cos(angle) * 0.5;
+            root.rotation.x = Math.sin(angle) * 0.5;
+            tree.add(root);
+        }
+
+        return tree;
     }
 
     createGlowingMushroom() {
@@ -123,16 +193,18 @@ export class PointsOfInterest {
     }
 
     createWildlifeArea() {
+        const config = this.poiConfig.wildlife || {
+            position: { x: 15, y: 0, z: -80 },
+            cameraPosition: { x: 15, y: 3, z: -70 },
+            lookAt: { x: 15, y: 1.5, z: -80 }
+        };
+
         const wildlifeArea = new THREE.Group();
 
         // Create some animal silhouettes (deer)
         for (let i = 0; i < 3; i++) {
             const deer = this.createDeer();
-            deer.position.set(
-                i * 3 - 3,
-                0,
-                Math.random() * 2 - 1
-            );
+            deer.position.set(i * 3 - 3, 0, Math.random() * 2 - 1);
             deer.rotation.y = Math.random() * 0.5 - 0.25;
             wildlifeArea.add(deer);
         }
@@ -164,20 +236,19 @@ export class PointsOfInterest {
             wildlifeArea.add(flower);
         }
 
-        wildlifeArea.position.set(15, 0, -80);
+        wildlifeArea.position.set(config.position.x, config.position.y, config.position.z);
         this.sceneManager.add(wildlifeArea);
 
         this.points.wildlife = {
             object: wildlifeArea,
-            cameraPosition: { x: 15, y: 3, z: -70 },
-            lookAt: { x: 15, y: 1.5, z: -80 }
+            cameraPosition: config.cameraPosition,
+            lookAt: config.lookAt
         };
     }
 
     createDeer() {
         const deer = new THREE.Group();
 
-        // Body (using cylinder + spheres for capsule-like shape)
         const bodyMaterial = new THREE.MeshStandardMaterial({
             color: 0x8b6914,
             roughness: 0.8
@@ -227,7 +298,7 @@ export class PointsOfInterest {
             deer.add(leg);
         });
 
-        // Antlers (simple)
+        // Antlers
         const antlerMaterial = new THREE.MeshStandardMaterial({
             color: 0x5a4a3a,
             roughness: 0.7
@@ -264,7 +335,7 @@ export class PointsOfInterest {
         rightWing.position.z = -0.1;
         butterfly.add(rightWing);
 
-        // Body (cylinder instead of capsule for r128 compatibility)
+        // Body
         const bodyGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.15, 6);
         const bodyMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 });
         const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
@@ -316,6 +387,12 @@ export class PointsOfInterest {
     }
 
     createRiver() {
+        const config = this.poiConfig.river || {
+            position: { x: 0, y: 0, z: -120 },
+            cameraPosition: { x: 5, y: 2, z: -110 },
+            lookAt: { x: 0, y: 0, z: -130 }
+        };
+
         const riverGroup = new THREE.Group();
 
         // River bed
@@ -387,13 +464,13 @@ export class PointsOfInterest {
         sparkles.userData.isSparkle = true;
         riverGroup.add(sparkles);
 
-        riverGroup.position.set(0, 0, -120);
+        riverGroup.position.set(config.position.x, config.position.y, config.position.z);
         this.sceneManager.add(riverGroup);
 
         this.points.river = {
             object: riverGroup,
-            cameraPosition: { x: 5, y: 2, z: -110 },
-            lookAt: { x: 0, y: 0, z: -130 }
+            cameraPosition: config.cameraPosition,
+            lookAt: config.lookAt
         };
     }
 
@@ -403,5 +480,13 @@ export class PointsOfInterest {
 
     getAllPoints() {
         return this.points;
+    }
+
+    /**
+     * Get point names
+     * @returns {string[]} Array of point names
+     */
+    getPointNames() {
+        return Object.keys(this.points);
     }
 }

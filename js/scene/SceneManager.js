@@ -154,18 +154,18 @@ export class SceneManager {
             const startY = 10;
             const startX = 5;
 
-            // End position (high above, looking down at Earth)
-            const endZ = -120;
-            const endY = 150;
+            // End position (very high above to see Earth fully)
+            const endZ = -140;
+            const endY = 300;  // Much higher to see Earth (radius 50, at Y:-120)
             const endX = 0;
 
             this.camera.position.z = this.lerp(startZ, endZ, eased);
             this.camera.position.y = this.lerp(startY, endY, eased);
             this.camera.position.x = this.lerp(startX, endX, eased);
 
-            // Look at deforestation first, then Earth
+            // Look at deforestation first, then Earth center
             const lookAtDeforestation = new THREE.Vector3(15, 1, -115);
-            const lookAtEarth = new THREE.Vector3(0, -120, -150);
+            const lookAtEarth = new THREE.Vector3(0, -80, -150);  // Earth center (updated position)
 
             const currentLookAt = new THREE.Vector3(
                 this.lerp(lookAtDeforestation.x, lookAtEarth.x, eased),
@@ -176,11 +176,11 @@ export class SceneManager {
             this.camera.lookAt(currentLookAt);
 
             // Clear fog for space view
-            this.scene.fog.density = CONFIG.scene.fogDensity * (1 - eased * 0.9);
+            this.scene.fog.density = CONFIG.scene.fogDensity * (1 - eased * 0.95);
 
             // Change background color to space (darker)
             const pollutedColor = new THREE.Color(0x1a1510);
-            const spaceColor = new THREE.Color(0x000005);
+            const spaceColor = new THREE.Color(0x000008);
             const currentColor = pollutedColor.clone().lerp(spaceColor, eased);
             this.renderer.setClearColor(currentColor, 1);
 

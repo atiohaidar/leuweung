@@ -8,6 +8,7 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/hero.css">
 </head>
 
 <body>
@@ -15,6 +16,15 @@
     <div id="loading-screen">
         <div class="loading-spinner"></div>
         <p class="loading-text">Memuat Hutan...</p>
+    </div>
+
+    <!-- Hero Start Screen -->
+    <div id="hero-screen" class="hidden">
+        <div class="hero-content">
+            <h1 class="hero-title">FOREST JOURNEY</h1>
+            <p class="hero-subtitle">Petualangan Menembus Hutan 3D</p>
+            <button id="start-btn" class="hero-btn">MULAI PETUALANGAN</button>
+        </div>
     </div>
 
     <!-- Progress Bar -->
@@ -28,6 +38,9 @@
     <!-- Fog Overlay -->
     <div class="fog-overlay"></div>
 
+    <!-- Cinematic Vignette (activated for special sections) -->
+    <div id="vignette-overlay" class="vignette-overlay"></div>
+
     <!-- Scroll Spacers (invisible, just for scroll length) -->
     <div class="scroll-spacer" style="height: 600vh;"></div>
 
@@ -37,7 +50,11 @@
     </footer>
 
     <!-- Three.js Library -->
+    <!-- Three.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js Addons (required for text) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/examples/js/geometries/TextGeometry.js"></script>
 
     <!-- Main Application (ES Modules) -->
     <script type="module" src="js/main.js"></script>

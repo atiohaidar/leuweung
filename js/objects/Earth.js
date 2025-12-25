@@ -51,9 +51,12 @@ export class Earth {
         this.atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
         this.earthGroup.add(this.atmosphere);
 
-        // Position Earth below and in front (visible during zoom out)
-        // Camera will be at Y:150, Z:-100, looking at this position
-        this.earthGroup.position.set(0, -120, -150);
+        // Position Earth - visible when camera is at Y:300 looking down
+        // Camera ends at Y:300, Z:-140, looking at Y:-120, Z:-150
+        this.earthGroup.position.set(0, -80, -150);
+
+        // Add stars around Earth
+        this.addStars();
 
         this.sceneManager.add(this.earthGroup);
     }
@@ -113,6 +116,37 @@ export class Earth {
         southIce.position.y = -48;
         southIce.rotation.x = Math.PI;
         this.earthGroup.add(southIce);
+    }
+
+    addStars() {
+        // Create stars around the Earth for space effect
+        const starCount = 500;
+        const starGeometry = new THREE.BufferGeometry();
+        const starPositions = new Float32Array(starCount * 3);
+
+        for (let i = 0; i < starCount * 3; i += 3) {
+            // Spread stars in a large sphere around
+            const radius = 200 + Math.random() * 300;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.random() * Math.PI;
+
+            starPositions[i] = radius * Math.sin(phi) * Math.cos(theta);
+            starPositions[i + 1] = radius * Math.cos(phi) - 100; // Offset down
+            starPositions[i + 2] = radius * Math.sin(phi) * Math.sin(theta) - 150;
+        }
+
+        starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+
+        const starMaterial = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 1,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        this.sceneManager.add(stars);
     }
 
     update(time) {

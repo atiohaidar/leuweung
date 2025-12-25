@@ -1,0 +1,134 @@
+/* ========================================
+   3D Labels Component
+   ======================================== */
+
+.labels-3d-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: var(--z-labels);
+    overflow: hidden;
+}
+
+.label-3d {
+    position: fixed;
+    max-width: 350px;
+    padding: 20px 25px;
+    background: rgba(10, 26, 15, 0.85);
+    border: 1px solid rgba(168, 230, 207, 0.4);
+    border-radius: var(--border-radius-sm);
+    backdrop-filter: var(--glass-blur);
+    pointer-events: auto;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    box-shadow: var(--shadow-md);
+}
+
+.label-3d .label-content {
+    position: relative;
+}
+
+.label-3d .label-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 8px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.label-3d .label-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    opacity: 0.9;
+}
+
+/* Connector line */
+.label-3d .label-connector {
+    position: absolute;
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-primary), transparent);
+    top: 50%;
+    left: -45px;
+    transform: translateY(-50%);
+}
+
+.label-3d.right .label-connector {
+    left: auto;
+    right: -45px;
+    background: linear-gradient(270deg, var(--color-primary), transparent);
+}
+
+.label-3d.center .label-connector {
+    display: none;
+}
+
+/* Warning theme (for deforestation) */
+.label-3d.warning {
+    border-color: var(--color-warning-light);
+    background: var(--color-warning-bg);
+}
+
+.label-3d.warning .label-title {
+    color: var(--color-warning);
+}
+
+.label-3d.warning .label-connector {
+    background: linear-gradient(90deg, var(--color-warning), transparent);
+}
+
+/* CTA theme (for earth/call to action) */
+.label-3d.cta {
+    border-color: rgba(168, 230, 207, 0.6);
+    background: rgba(10, 26, 15, 0.95);
+    text-align: center;
+    max-width: 450px;
+}
+
+.label-3d.cta .label-title {
+    font-size: 1.8rem;
+}
+
+.label-3d.cta .label-description {
+    font-size: 1.1rem;
+}
+
+/* Animations */
+@keyframes labelFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9) translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) translateY(0);
+    }
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+@media (max-width: 768px) {
+    .label-3d {
+        max-width: 280px;
+        padding: 15px 18px;
+    }
+
+    .label-3d .label-title {
+        font-size: 1.1rem;
+    }
+
+    .label-3d .label-description {
+        font-size: 0.85rem;
+    }
+
+    .label-3d .label-connector {
+        display: none;
+    }
+}

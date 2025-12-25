@@ -1,7 +1,10 @@
 /**
  * 3D Labels - Floating labels that appear beside 3D objects
+ * Now reads configuration from config.js for better maintainability
  * @module Labels3D
  */
+
+import { CONFIG } from '../config.js';
 
 export class Labels3D {
     constructor(sceneManager) {
@@ -25,58 +28,8 @@ export class Labels3D {
     }
 
     createLabels() {
-        const labelData = [
-            {
-                id: 'hero',
-                title: '🌲 Hayu Ka Leuweung',
-                description: 'Duka di leuweung aya naon wae, hayu atuh meh teu panasaran',
-                position3D: { x: 5, y: 4, z: 0 },
-                visibleRange: { min: 0, max: 0.15 },
-                side: 'right'
-            },
-            {
-                id: 'giantTree',
-                title: '🌳 Pohon Raksasa',
-                description: 'Pohon berusia ratusan tahun yang menjulang tinggi ke langit',
-                position3D: { x: -8, y: 12, z: -50 },
-                visibleRange: { min: 0.15, max: 0.30 },
-                side: 'right'
-            },
-            {
-                id: 'wildlife',
-                title: '🦋 Kehidupan Liar',
-                description: 'Beragam satwa liar hidup harmonis di ekosistem hutan',
-                position3D: { x: 22, y: 3, z: -80 },
-                visibleRange: { min: 0.30, max: 0.45 },
-                side: 'right'
-            },
-            {
-                id: 'river',
-                title: '💧 Sungai Jernih',
-                description: 'Aliran sungai yang mengalir jernih di antara pepohonan',
-                position3D: { x: 8, y: 2, z: -120 },
-                visibleRange: { min: 0.45, max: 0.55 },
-                side: 'right'
-            },
-            {
-                id: 'deforestation',
-                title: '⚠️ Ancaman Nyata',
-                description: 'Jutaan hektar hutan hilang setiap tahun akibat penebangan liar',
-                position3D: { x: 22, y: 5, z: -115 },
-                visibleRange: { min: 0.55, max: 0.75 },
-                side: 'right',
-                theme: 'warning'
-            },
-            {
-                id: 'earth',
-                title: '🌍 Lindungi Bumi Kita',
-                description: 'Bergabunglah dalam gerakan pelestarian hutan',
-                position3D: { x: 0, y: -50, z: -150 },
-                visibleRange: { min: 0.80, max: 1.0 },
-                side: 'center',
-                theme: 'cta'
-            }
-        ];
+        // Read label data from centralized config
+        const labelData = CONFIG.labels3D || [];
 
         labelData.forEach(data => {
             const label = this.createLabelElement(data);
@@ -172,5 +125,50 @@ export class Labels3D {
 
     getLabels() {
         return this.labels;
+    }
+
+    /**
+     * Dynamically add a new label at runtime
+     * @param {Object} labelData - Label configuration object
+     */
+    addLabel(labelData) {
+        const label = this.createLabelElement(labelData);
+        this.labels.push({
+            element: label,
+            ...labelData
+        });
+        this.container.appendChild(label);
+    }
+
+    /**
+     * Remove a label by ID
+     * @param {string} id - Label ID to remove
+     */
+    removeLabel(id) {
+        const index = this.labels.findIndex(l => l.id === id);
+        if (index !== -1) {
+            const label = this.labels[index];
+            label.element.remove();
+            this.labels.splice(index, 1);
+        }
+    }
+
+    /**
+     * Update label content dynamically
+     * @param {string} id - Label ID
+     * @param {Object} updates - Properties to update (title, description)
+     */
+    updateLabelContent(id, updates) {
+        const label = this.labels.find(l => l.id === id);
+        if (label) {
+            if (updates.title) {
+                label.title = updates.title;
+                label.element.querySelector('.label-title').textContent = updates.title;
+            }
+            if (updates.description) {
+                label.description = updates.description;
+                label.element.querySelector('.label-description').textContent = updates.description;
+            }
+        }
     }
 }

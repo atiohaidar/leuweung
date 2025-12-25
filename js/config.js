@@ -113,5 +113,183 @@ export const CONFIG = {
     // Animation settings
     animation: {
         loadingDelay: 1500
+    },
+
+    // 3D Labels configuration (content separated from logic)
+    labels3D: [
+        {
+            id: 'hero',
+            title: '🌲 Hayu Ka Leuweung',
+            description: 'Duka di leuweung aya naon wae, hayu atuh meh teu panasaran',
+            position3D: { x: 5, y: 4, z: 0 },
+            visibleRange: { min: 0, max: 0.15 },
+            side: 'right'
+        },
+        {
+            id: 'giantTree',
+            title: '🌳 Pohon Raksasa',
+            description: 'Pohon berusia ratusan tahun yang menjulang tinggi ke langit',
+            position3D: { x: -8, y: 12, z: -50 },
+            visibleRange: { min: 0.15, max: 0.30 },
+            side: 'right'
+        },
+        {
+            id: 'wildlife',
+            title: '🦋 Kehidupan Liar',
+            description: 'Beragam satwa liar hidup harmonis di ekosistem hutan',
+            position3D: { x: 22, y: 3, z: -80 },
+            visibleRange: { min: 0.30, max: 0.45 },
+            side: 'right'
+        },
+        {
+            id: 'river',
+            title: '💧 Sungai Jernih',
+            description: 'Aliran sungai yang mengalir jernih di antara pepohonan',
+            position3D: { x: 8, y: 2, z: -120 },
+            visibleRange: { min: 0.45, max: 0.55 },
+            side: 'right'
+        },
+        {
+            id: 'deforestation',
+            title: '⚠️ Ancaman Nyata',
+            description: 'Jutaan hektar hutan hilang setiap tahun akibat penebangan liar',
+            position3D: { x: 22, y: 5, z: -115 },
+            visibleRange: { min: 0.55, max: 0.75 },
+            side: 'right',
+            theme: 'warning'
+        },
+        {
+            id: 'earth',
+            title: '🌍 Lindungi Bumi Kita',
+            description: 'Bergabunglah dalam gerakan pelestarian hutan',
+            position3D: { x: 0, y: -50, z: -150 },
+            visibleRange: { min: 0.80, max: 1.0 },
+            side: 'center',
+            theme: 'cta'
+        }
+    ],
+
+    // 3D Section Titles configuration (fly-through text)
+    sectionTitles3D: {
+        params: {
+            visibilityDistance: 25,
+            fadeInDistance: 18,
+            flyThroughZone: 4,
+            scaleMultiplier: 2.0
+        },
+        sections: [
+            {
+                id: 'giantTree',
+                title: 'POHON',
+                subtitle: 'RAKSASA',
+                position: { x: 0, y: 2, z: -24 },
+                color: 0x4ade80,
+                emissive: 0x22c55e
+            },
+            {
+                id: 'wildlife',
+                title: 'KEHIDUPAN',
+                subtitle: 'LIAR',
+                position: { x: 0, y: 3, z: -58 },
+                color: 0x60a5fa,
+                emissive: 0x3b82f6
+            },
+            {
+                id: 'river',
+                title: 'SUNGAI',
+                subtitle: 'JERNIH',
+                position: { x: 0, y: 2, z: -92 },
+                color: 0x22d3ee,
+                emissive: 0x06b6d4
+            },
+            {
+                id: 'deforestation',
+                title: 'ANCAMAN',
+                subtitle: 'NYATA',
+                position: { x: 15, y: 5, z: -115 },  // Above the loggers area
+                color: 0xfb923c,
+                emissive: 0xf97316,
+                faceCamera: true
+            },
+            {
+                id: 'earth',
+                title: 'LINDUNGI',
+                subtitle: 'BUMI KITA',
+                position: { x: 0, y: 25, z: -130 },
+                color: 0xa78bfa,
+                emissive: 0x8b5cf6,
+                isVertical: true,
+                faceCamera: true,
+                cinematic: true  // Enable vignette for this section
+            },
+            {
+                id: 'finale',
+                title: 'JAGALAH',
+                subtitle: 'BUMI',
+                position: { x: 0, y: 150, z: -140 },  // Visible when camera rises high
+                color: 0x4ade80,
+                emissive: 0x22c55e,
+                isVertical: true,
+                faceCamera: true,
+                cinematic: true
+            },
+            {
+                id: 'credits',
+                title: 'YU KA LEUENG',
+                subtitle: 'Bikinnya make Three.js',
+                position: { x: 0, y: 250, z: -145 },  // At the very end
+                color: 0xffffff,
+                emissive: 0xaaaaaa,
+                isVertical: true,
+                faceCamera: true,
+                cinematic: true
+            }
+        ]
+    },
+
+    // Points of Interest configuration
+    pointsOfInterest: {
+        giantTree: {
+            position: { x: -15, y: 0, z: -50 },
+            cameraPosition: { x: -8, y: 5, z: -40 },
+            lookAt: { x: -15, y: 10, z: -50 }
+        },
+        wildlife: {
+            position: { x: 15, y: 0, z: -80 },
+            cameraPosition: { x: 15, y: 3, z: -70 },
+            lookAt: { x: 15, y: 1.5, z: -80 }
+        },
+        river: {
+            position: { x: 0, y: 0, z: -120 },
+            cameraPosition: { x: 5, y: 2, z: -110 },
+            lookAt: { x: 0, y: 0, z: -130 }
+        }
+    },
+
+    // UI Controls configuration
+    ui: {
+        controls: [
+            { id: 'magic', label: '✨ Magic Particles', defaultActive: true },
+            { id: 'birds', label: '🐦 Burung Terbang', defaultActive: true },
+            { id: 'flashlight', label: '🔦 Mode Senter', defaultActive: false },
+            { id: 'photo', label: '📸 Ambil Foto', type: 'action', icon: '📷' },
+            { id: 'season', label: '🍂 Musim', type: 'cycle', defaultValue: 'SUMMER' }
+        ]
+    },
+
+    // Effects settings
+    effects: {
+        mouseParallax: {
+            sensitivity: 0.0005,
+            smoothing: 0.05
+        },
+        magicParticles: {
+            maxParticles: 50,
+            colors: [0xffff88, 0x88ffff, 0xff88ff, 0x88ff88, 0xffffff]
+        },
+        flyingBirds: {
+            count: 5,
+            speed: 0.02
+        }
     }
 };
