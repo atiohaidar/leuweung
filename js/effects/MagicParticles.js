@@ -67,6 +67,7 @@ export class MagicParticles {
         });
 
         this.particleSystem = new THREE.Points(this.geometry, this.material);
+        this.particleSystem.frustumCulled = false; // FIX: Prevent culling when moving particles from off-screen
         this.scene.add(this.particleSystem);
     }
 
@@ -139,7 +140,12 @@ export class MagicParticles {
                 // Decay lifetime
                 this.lifetimes[i] -= this.decays[i];
 
-                // Fade out by reducing size
+                // Fade out by darkening color (since PointsMaterial doesn't support vertex alpha/size)
+                this.colors_array[i * 3] *= 0.95;
+                this.colors_array[i * 3 + 1] *= 0.95;
+                this.colors_array[i * 3 + 2] *= 0.95;
+
+                // Keep size update for reference/potential shader switch
                 this.sizes[i] *= 0.97;
 
                 // Kill dead particles
@@ -155,7 +161,8 @@ export class MagicParticles {
         // Only update buffers if there are active particles
         if (needsUpdate) {
             this.geometry.attributes.position.needsUpdate = true;
-            this.geometry.attributes.size.needsUpdate = true;
+            this.geometry.attributes.color.needsUpdate = true; // IMPORTANT: Update colors
+            // this.geometry.attributes.size.needsUpdate = true; // Not effective with standard PointsMaterial
         }
     }
 

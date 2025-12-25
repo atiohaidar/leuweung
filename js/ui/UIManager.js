@@ -77,6 +77,11 @@ export class UIManager {
         // Magic particles toggle
         const magicBtn = this.panel.querySelector('[data-control="magic"]');
         if (magicBtn && this.effects.magicParticles) {
+            // Sync initial state with actual effect state
+            const isEnabled = this.effects.magicParticles.enabled;
+            magicBtn.classList.toggle('active', isEnabled);
+            magicBtn.textContent = isEnabled ? 'ON' : 'OFF';
+
             magicBtn.addEventListener('click', (e) => {
                 const btn = e.target;
                 const isActive = btn.classList.toggle('active');

@@ -12,7 +12,7 @@ export const effectsConfig = {
 
     // Magic particles
     magicParticles: {
-        enabled: false, // Default off as requested
+        enabled: true, // Default on primarily for demo
         maxParticles: 50,
         colors: [0xffff88, 0x88ffff, 0xff88ff, 0x88ff88, 0xffffff],
         spawnDistance: { min: 5, max: 8 }
@@ -49,8 +49,8 @@ export const effectsConfig = {
 
     // Auto scroll
     autoScroll: {
-        fastSpeed: 1.5,
-        slowSpeed: 0.5,
+        fastSpeed: 2.2,
+        slowSpeed: 2,
         scrollThreshold: 0.45,
         reverseSpeedMultiplier: 3,
         resumeDelay: 2000,

@@ -128,16 +128,16 @@ export const objectsConfig = {
             clickable: true,
             info: {
                 emoji: '🌳',
-                name: 'Pohon Raksasa',
-                latinName: 'Ficus benjamina',
-                description: 'Pohon berusia ratusan tahun yang menjulang tinggi ke langit. Pohon ini adalah saksi bisu sejarah hutan dan menjadi rumah bagi berbagai makhluk hidup.',
+                name: 'Ini Pohon',
+                latinName: 'Lorem Ipsum',
+                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
                 facts: [
-                    'Tinggi mencapai 60+ meter',
-                    'Usia lebih dari 500 tahun',
-                    'Menyerap 22kg CO2 setiap tahun'
+                    'Lorem ipsum dolor sit amet',
+                    'Consectetur adipiscing elit',
+                    'Sed do eiusmod tempor incididunt'
                 ],
-                habitat: 'Hutan hujan tropis',
-                status: 'Langka'
+                habitat: 'Lorem Ipsum',
+                status: 'Lorem Ipsum'
             },
             camera: {
                 position: { x: -8, y: 5, z: -40 },
@@ -151,15 +151,15 @@ export const objectsConfig = {
             info: {
                 emoji: '🦋',
                 name: 'Area Kehidupan Liar',
-                latinName: 'Ecosystem Zone',
-                description: 'Area di mana beragam satwa liar hidup harmonis dalam ekosistem hutan yang seimbang. Di sini kamu bisa menemukan rusa, kelinci, dan kupu-kupu.',
+                latinName: 'Lorem Ipsum',
+                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
                 facts: [
-                    'Rumah bagi 2 rusa dan 4 kelinci',
-                    'Banyak kupu-kupu berwarna-warni',
-                    'Ekosistem seimbang alami'
+                    'Lorem ipsum dolor sit amet',
+                    'Consectetur adipiscing elit',
+                    'Sed do eiusmod tempor incididunt'
                 ],
-                habitat: 'Padang rumput dalam hutan',
-                status: 'Terjaga'
+                habitat: 'Lorem Ipsum',
+                status: 'Lorem Ipsum'
             },
             camera: {
                 position: { x: 15, y: 3, z: -70 },
@@ -173,15 +173,15 @@ export const objectsConfig = {
             info: {
                 emoji: '💧',
                 name: 'Sungai Jernih',
-                latinName: 'Freshwater Stream',
-                description: 'Aliran sungai jernih yang mengalir dari pegunungan. Airnya yang bersih menjadi sumber kehidupan bagi seluruh penghuni hutan.',
+                latinName: 'Lorem Ipsum',
+                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
                 facts: [
-                    'Air berasal dari mata air pegunungan',
-                    'Ikan melompat-lompat di permukaan',
-                    'Sumber air minum satwa hutan'
+                    'Lorem ipsum dolor sit amet',
+                    'Consectetur adipiscing elit',
+                    'Sed do eiusmod tempor incididunt'
                 ],
-                habitat: 'Lembah hutan',
-                status: 'Bersih'
+                habitat: 'Lorem Ipsum',
+                status: 'Lorem Ipsum'
             },
             camera: {
                 position: { x: 5, y: 2, z: -110 },
@@ -195,15 +195,15 @@ export const objectsConfig = {
             info: {
                 emoji: '⚠️',
                 name: 'Ancaman Nyata',
-                latinName: 'Deforestation Zone',
-                description: 'Area penebangan liar yang mengancam ekosistem hutan. Aktivitas ini menghancurkan habitat satwa dan berkontribusi pada perubahan iklim.',
+                latinName: 'Lorem Ipsum',
+                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
                 facts: [
-                    'Jutaan hektar hutan hilang setiap tahun',
-                    'Habitat satwa liar terancam punah',
-                    'Mempercepat perubahan iklim global'
+                    'Lorem ipsum dolor sit amet',
+                    'Consectetur adipiscing elit',
+                    'Sed do eiusmod tempor incididunt'
                 ],
-                habitat: 'Bekas hutan',
-                status: 'Kritis',
+                habitat: 'Lorem Ipsum',
+                status: 'Lorem Ipsum',
                 theme: 'warning'
             },
             camera: {
@@ -218,15 +218,15 @@ export const objectsConfig = {
             info: {
                 emoji: '🌍',
                 name: 'Bumi Kita',
-                latinName: 'Planet Earth',
-                description: 'Planet biru tempat kita tinggal. Hutan menutupi 31% daratan dan menjadi paru-paru dunia yang harus kita lindungi.',
+                latinName: 'Lorem Ipsum',
+                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
                 facts: [
-                    'Hutan menutupi 31% daratan bumi',
-                    'Disebut paru-paru dunia',
-                    'Rumah bagi jutaan spesies'
+                    'Lorem ipsum dolor sit amet',
+                    'Consectetur adipiscing elit',
+                    'Sed do eiusmod tempor incididunt'
                 ],
-                habitat: 'Tata Surya',
-                status: 'Perlu Dilindungi',
+                habitat: 'Lorem Ipsum',
+                status: 'Lorem Ipsum',
                 theme: 'cta'
             },
             camera: {
@@ -242,16 +242,16 @@ export const objectsConfig = {
             clickable: true,
             info: {
                 emoji: '🦌',
-                name: 'Rusa Hutan',
-                latinName: 'Cervus timorensis',
-                description: 'Rusa adalah mamalia herbivora yang anggun dan hidup berkelompok di hutan. Mereka memiliki peran penting dalam menjaga keseimbangan ekosistem.',
+                name: 'Ceritanya rusa',
+                latinName: 'Lorem Ipsum',
+                description: 'Mereka memiliki peran penting dalam menjaga keseimbangan ekosistem.',
                 facts: [
-                    'Tanduk rusa jantan bisa tumbuh hingga 1 cm per hari!',
-                    'Rusa bisa berlari hingga 60 km/jam',
-                    'Mereka adalah hewan sosial yang hidup dalam kelompok'
+                    'Ini rusa nya dari AI',
+                    'Eheheh',
+                    'Ya begitulah'
                 ],
-                habitat: 'Hutan tropis dan padang rumput',
-                status: 'Dilindungi'
+                habitat: 'Lorem Ipsum',
+                status: 'Lorem Ipsum'
             },
             camera: {
                 position: { x: 2, y: 2, z: -55 },
@@ -265,15 +265,15 @@ export const objectsConfig = {
             info: {
                 emoji: '🐰',
                 name: 'Kelinci Hutan',
-                latinName: 'Lepus nigricollis',
-                description: 'Kelinci adalah hewan kecil yang lincah dan menggemaskan. Mereka berperan penting dalam rantai makanan hutan.',
+                latinName: 'Lorem Ipsum',
+                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
                 facts: [
-                    'Kelinci bisa melompat setinggi 1 meter!',
-                    'Gigi kelinci tidak pernah berhenti tumbuh',
-                    'Mereka punya penglihatan hampir 360 derajat'
+                    'Lorem ipsum dolor sit amet',
+                    'Consectetur adipiscing elit',
+                    'Sed do eiusmod tempor incididunt'
                 ],
-                habitat: 'Semak-semak dan lubang tanah',
-                status: 'Umum'
+                habitat: 'Lorem Ipsum',
+                status: 'Lorem Ipsum'
             },
             camera: {
                 position: { x: 3, y: 1.5, z: -55 },
@@ -287,15 +287,15 @@ export const objectsConfig = {
             info: {
                 emoji: '🦋',
                 name: 'Kupu-kupu',
-                latinName: 'Papilionoidea',
-                description: 'Kupu-kupu adalah serangga penyerbuk yang sangat penting untuk reproduksi tanaman berbunga di hutan.',
+                latinName: 'Lorem Ipsum',
+                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
                 facts: [
-                    'Kupu-kupu bisa melihat warna ultraviolet',
-                    'Sayap mereka tertutup ribuan sisik kecil',
-                    'Ada lebih dari 20.000 spesies kupu-kupu di dunia'
+                    'Lorem ipsum dolor sit amet',
+                    'Consectetur adipiscing elit',
+                    'Sed do eiusmod tempor incididunt'
                 ],
-                habitat: 'Padang bunga dan hutan',
-                status: 'Beragam'
+                habitat: 'Lorem Ipsum',
+                status: 'Lorem Ipsum'
             },
             camera: {
                 position: { x: 2, y: 3, z: -55 },
@@ -309,15 +309,15 @@ export const objectsConfig = {
             info: {
                 emoji: '🐟',
                 name: 'Ikan Sungai',
-                latinName: 'Cyprinidae',
-                description: 'Ikan sungai adalah penghuni air tawar yang vital bagi ekosistem sungai. Mereka menjadi indikator kesehatan sungai.',
+                latinName: 'Lorem Ipsum',
+                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
                 facts: [
-                    'Ikan bisa merasakan getaran air dari jarak jauh',
-                    'Beberapa ikan bisa melompat hingga 3 meter!',
-                    'Ikan bernapas menggunakan insang'
+                    'Lorem ipsum dolor sit amet',
+                    'Consectetur adipiscing elit',
+                    'Sed do eiusmod tempor incididunt'
                 ],
-                habitat: 'Sungai dan danau air tawar',
-                status: 'Beragam'
+                habitat: 'Lorem Ipsum',
+                status: 'Lorem Ipsum'
             },
             camera: {
                 position: { x: 3, y: 2, z: -88 },
@@ -331,15 +331,15 @@ export const objectsConfig = {
             info: {
                 emoji: '🌲',
                 name: 'Pohon Hutan',
-                latinName: 'Dipterocarpaceae',
-                description: 'Pohon adalah tulang punggung ekosistem hutan. Mereka menyediakan oksigen, tempat tinggal bagi satwa, dan menyerap karbon.',
+                latinName: 'Lorem Ipsum',
+                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
                 facts: [
-                    'Satu pohon dewasa menyerap 22kg CO2 per tahun',
-                    'Pohon berkomunikasi melalui jaringan akar',
-                    'Hutan tropis menyimpan 25% karbon dunia'
+                    'Lorem ipsum dolor sit amet',
+                    'Consectetur adipiscing elit',
+                    'Sed do eiusmod tempor incididunt'
                 ],
-                habitat: 'Hutan hujan tropis',
-                status: 'Terancam penebangan'
+                habitat: 'Lorem Ipsum',
+                status: 'Lorem Ipsum'
             },
             camera: {
                 position: { x: 5, y: 4, z: -20 },

@@ -17,7 +17,7 @@ export const sceneConfig = {
         near: 0.1,
         far: 1000,
         initialPosition: { x: 0, y: 2, z: 10 },
-        maxScrollZ: 180,
+        maxScrollZ: 150,
         swayAmount: 0.5,
         swaySpeed: 0.3,
         // Scroll smoothing (0.01 = very smooth/cinematic, 0.2 = responsive)
