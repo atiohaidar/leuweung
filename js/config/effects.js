@@ -12,6 +12,7 @@ export const effectsConfig = {
 
     // Magic particles
     magicParticles: {
+        enabled: false, // Default off as requested
         maxParticles: 50,
         colors: [0xffff88, 0x88ffff, 0xff88ff, 0x88ff88, 0xffffff],
         spawnDistance: { min: 5, max: 8 }

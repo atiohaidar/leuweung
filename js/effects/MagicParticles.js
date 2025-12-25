@@ -13,10 +13,10 @@ export class MagicParticles {
         this.scene = sceneManager.getScene();
         this.camera = sceneManager.getCamera();
 
-        this.enabled = true;
-
         // Load configuration
         const config = CONFIG.effects?.magicParticles || {};
+        this.enabled = config.enabled !== undefined ? config.enabled : true;
+
         this.maxParticles = config.maxParticles || 50;
         this.colors = config.colors || [0xffff88, 0x88ffff, 0xff88ff, 0x88ff88, 0xffffff];
 
