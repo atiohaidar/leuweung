@@ -1,7 +1,10 @@
 /**
  * Jumping Fish - Animated fish jumping from the river
+ * Reads configuration from config.js for better maintainability
  * @module JumpingFish
  */
+
+import { CONFIG } from '../config.js';
 
 export class JumpingFish {
     constructor(sceneManager) {
@@ -9,8 +12,14 @@ export class JumpingFish {
         this.scene = sceneManager.getScene();
 
         this.fish = [];
-        this.riverPosition = { x: 0, z: -92 }; // Near river section
         this.enabled = true;
+
+        // Load configuration from config.js
+        const config = CONFIG.effects?.jumpingFish || {};
+        this.riverPosition = config.position || { x: 0, z: -92 };
+        this.fishCount = config.count || 5;
+        this.jumpHeightRange = config.jumpHeight || { min: 0.8, max: 1.3 };
+        this.jumpSpeedRange = config.jumpSpeed || { min: 0.8, max: 1.3 };
 
         this.createFish();
     }
@@ -50,16 +59,18 @@ export class JumpingFish {
     }
 
     createFish() {
-        // Create several fish with different jump timings
-        for (let i = 0; i < 5; i++) {
+        const { min: minHeight, max: maxHeight } = this.jumpHeightRange;
+        const { min: minSpeed, max: maxSpeed } = this.jumpSpeedRange;
+
+        for (let i = 0; i < this.fishCount; i++) {
             const fish = this.createFishMesh();
 
             fish.userData = {
                 baseX: this.riverPosition.x + (Math.random() - 0.5) * 8,
                 baseZ: this.riverPosition.z + (Math.random() - 0.5) * 20,
                 jumpPhase: Math.random() * Math.PI * 2,
-                jumpSpeed: 0.8 + Math.random() * 0.5,
-                jumpHeight: 0.8 + Math.random() * 0.5,
+                jumpSpeed: minSpeed + Math.random() * (maxSpeed - minSpeed),
+                jumpHeight: minHeight + Math.random() * (maxHeight - minHeight),
                 rotationSpeed: 2 + Math.random() * 2
             };
 
@@ -109,5 +120,13 @@ export class JumpingFish {
                 fish.visible = false;
             });
         }
+    }
+
+    /**
+     * Get all fish
+     * @returns {THREE.Group[]} Array of fish groups
+     */
+    getFish() {
+        return this.fish;
     }
 }

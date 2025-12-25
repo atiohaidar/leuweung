@@ -1,7 +1,10 @@
 /**
  * Seasonal Themes - Switch between different seasons
+ * Reads configuration from config.js for better maintainability
  * @module SeasonalThemes
  */
+
+import { CONFIG } from '../config.js';
 
 export class SeasonalThemes {
     constructor(sceneManager, trees, ground) {
@@ -12,14 +15,26 @@ export class SeasonalThemes {
         this.ground = ground;
 
         this.currentSeason = 'summer';
-        this.seasonConfig = {
+        this.isTransitioning = false;
+
+        // Load configuration from config.js
+        const config = CONFIG.seasonalThemes || {};
+        this.transitionDuration = config.transitionDuration || 2000;
+        this.seasonConfig = config.seasons || this.getDefaultSeasonConfig();
+    }
+
+    /**
+     * Default season configuration (fallback)
+     */
+    getDefaultSeasonConfig() {
+        return {
             spring: {
                 fogColor: 0x1a3a1f,
                 clearColor: 0x87ceeb,
                 fogDensity: 0.01,
                 groundColor: 0x2d5a2d,
                 foliageColors: [0x90EE90, 0x98FB98, 0x00FA9A, 0x3CB371],
-                particleColor: 0xFFB7C5, // Cherry blossoms
+                particleColor: 0xFFB7C5,
                 ambientIntensity: 0.6
             },
             summer: {
@@ -37,22 +52,19 @@ export class SeasonalThemes {
                 fogDensity: 0.012,
                 groundColor: 0x5a4a2a,
                 foliageColors: [0xFF6347, 0xFFA500, 0xFFD700, 0xDC143C],
-                particleColor: 0xFFA500, // Falling leaves
+                particleColor: 0xFFA500,
                 ambientIntensity: 0.4
             },
             winter: {
                 fogColor: 0xd0e0f0,
                 clearColor: 0x1a2a3a,
                 fogDensity: 0.008,
-                groundColor: 0xe8e8e8, // Snow
+                groundColor: 0xe8e8e8,
                 foliageColors: [0x2d4a3a, 0x3d5a4a, 0x1d3a2a, 0x4d5a4a],
-                particleColor: 0xffffff, // Snow
+                particleColor: 0xffffff,
                 ambientIntensity: 0.7
             }
         };
-
-        this.transitionDuration = 2000;
-        this.isTransitioning = false;
     }
 
     setSeason(season) {
@@ -121,7 +133,7 @@ export class SeasonalThemes {
     }
 
     nextSeason() {
-        const seasons = ['spring', 'summer', 'autumn', 'winter'];
+        const seasons = Object.keys(this.seasonConfig);
         const currentIndex = seasons.indexOf(this.currentSeason);
         const nextIndex = (currentIndex + 1) % seasons.length;
         this.setSeason(seasons[nextIndex]);
@@ -130,6 +142,23 @@ export class SeasonalThemes {
 
     getCurrentSeason() {
         return this.currentSeason;
+    }
+
+    /**
+     * Get available seasons
+     * @returns {string[]} Array of season names
+     */
+    getAvailableSeasons() {
+        return Object.keys(this.seasonConfig);
+    }
+
+    /**
+     * Get season configuration
+     * @param {string} season - Season name
+     * @returns {Object} Season configuration
+     */
+    getSeasonConfig(season) {
+        return this.seasonConfig[season];
     }
 
     easeInOutCubic(t) {

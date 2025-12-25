@@ -232,6 +232,12 @@ export class UIManager {
                 if (heroScreen) {
                     heroScreen.classList.add('hidden');
                 }
+
+                // Enable auto-scroll immediately
+                if (this.effects.autoScroll) {
+                    this.effects.autoScroll.start();
+                }
+
                 if (onStart) onStart();
             });
         }

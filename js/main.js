@@ -32,6 +32,8 @@ import { Labels3D } from './effects/Labels3D.js';
 import { SectionTitles3D } from './effects/SectionTitles3D.js';
 import { JumpingFish } from './effects/JumpingFish.js';
 
+
+
 /**
  * Main application class for the Forest Experience
  * Orchestrates scene setup, effects, and UI interactions
@@ -132,7 +134,7 @@ class ForestExperience {
             this.sceneObjects.pointsOfInterest
         );
         this.effects.autoScroll = new AutoScroll();
-        // this.effects.labels3D = new Labels3D(sm); // Uncomment to enable
+        this.effects.labels3D = new Labels3D(sm);
         this.effects.sectionTitles3D = new SectionTitles3D(sm);
         this.effects.jumpingFish = new JumpingFish(sm);
     }
@@ -160,11 +162,6 @@ class ForestExperience {
         this.registerUpdatable(this.effects.sectionTitles3D, 'SectionTitles3D');
         this.registerUpdatable(this.effects.jumpingFish, 'JumpingFish');
         this.registerUpdatable(this.effects.labels3D, 'Labels3D');
-
-        // Register special handlers
-        this.animationManager.registerHandler('butterflies', (time) => {
-            this.updateButterflies(time);
-        });
     }
 
     /**
@@ -214,23 +211,6 @@ class ForestExperience {
         });
     }
 
-    /**
-     * Animate butterflies in wildlife area
-     */
-    updateButterflies(time) {
-        const poi = this.sceneObjects.pointsOfInterest;
-        if (poi?.points?.wildlife) {
-            const wildlifeGroup = poi.points.wildlife.object;
-            wildlifeGroup.children.forEach(child => {
-                if (child.userData?.phase !== undefined) {
-                    const data = child.userData;
-                    child.position.y += Math.sin(time * data.speed * 5 + data.phase) * 0.02;
-                    child.position.x += Math.sin(time * data.speed * 3 + data.phase) * 0.01;
-                    child.rotation.y = Math.sin(time * data.speed * 8) * 0.3;
-                }
-            });
-        }
-    }
 
     /**
      * Start the experience

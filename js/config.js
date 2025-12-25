@@ -182,6 +182,7 @@ export const CONFIG = {
                 id: 'giantTree',
                 title: 'POHON',
                 subtitle: 'RAKSASA',
+                description: 'Saksi bisu sejarah yang berdiri kokoh selama ratusan tahun',
                 position: { x: 0, y: 2, z: -24 },
                 color: 0x4ade80,
                 emissive: 0x22c55e
@@ -190,6 +191,7 @@ export const CONFIG = {
                 id: 'wildlife',
                 title: 'KEHIDUPAN',
                 subtitle: 'LIAR',
+                description: 'Harmoni alam dimana flora dan fauna hidup berdampingan',
                 position: { x: 0, y: 3, z: -58 },
                 color: 0x60a5fa,
                 emissive: 0x3b82f6
@@ -198,6 +200,7 @@ export const CONFIG = {
                 id: 'river',
                 title: 'SUNGAI',
                 subtitle: 'JERNIH',
+                description: 'Sumber kehidupan yang mengalirkan kesegaran ke seluruh hutan',
                 position: { x: 0, y: 2, z: -92 },
                 color: 0x22d3ee,
                 emissive: 0x06b6d4
@@ -206,6 +209,7 @@ export const CONFIG = {
                 id: 'deforestation',
                 title: 'ANCAMAN',
                 subtitle: 'NYATA',
+                description: 'Keserakahan manusia yang mengancam kelestarian paru-paru dunia',
                 position: { x: 15, y: 5, z: -115 },  // Above the loggers area
                 color: 0xfb923c,
                 emissive: 0xf97316,
@@ -215,6 +219,7 @@ export const CONFIG = {
                 id: 'earth',
                 title: 'LINDUNGI',
                 subtitle: 'BUMI KITA',
+                description: 'Satu langkah kecil kita hari ini, nafas panjang bumi di masa depan',
                 position: { x: 0, y: 25, z: -130 },
                 color: 0xa78bfa,
                 emissive: 0x8b5cf6,
@@ -226,6 +231,7 @@ export const CONFIG = {
                 id: 'finale',
                 title: 'JAGALAH',
                 subtitle: 'BUMI',
+                description: 'Karena bumi bukan warisan nenek moyang, tapi titipan anak cucu',
                 position: { x: 0, y: 150, z: -140 },  // Visible when camera rises high
                 color: 0x4ade80,
                 emissive: 0x22c55e,
@@ -237,6 +243,7 @@ export const CONFIG = {
                 id: 'credits',
                 title: 'YU KA LEUENG',
                 subtitle: 'Bikinnya make Three.js',
+                description: 'Dipersembahkan dengan cinta untuk alam Indonesia',
                 position: { x: 0, y: 250, z: -145 },  // At the very end
                 color: 0xffffff,
                 emissive: 0xaaaaaa,
@@ -288,8 +295,113 @@ export const CONFIG = {
             colors: [0xffff88, 0x88ffff, 0xff88ff, 0x88ff88, 0xffffff]
         },
         flyingBirds: {
+            flockCount: 3,
+            birdsPerFlock: { min: 5, max: 12 },
+            speed: { min: 0.3, max: 0.6 },
+            startZ: 50,
+            endZ: -250,
+            height: { min: 2, max: 8 },
+            spread: 20
+        },
+        jumpingFish: {
+            position: { x: 0, z: -92 },
             count: 5,
-            speed: 0.02
+            jumpHeight: { min: 0.8, max: 1.3 },
+            jumpSpeed: { min: 0.8, max: 1.3 }
+        },
+        flashlight: {
+            color: 0xffffee,
+            intensity: 3,
+            distance: 30,
+            angle: Math.PI / 6,
+            penumbra: 0.5,
+            decay: 1
+        },
+        autoScroll: {
+            fastSpeed: 1.5,
+            slowSpeed: 0.5,
+            scrollThreshold: 0.45 // Percentage where it slows down
+        }
+    },
+
+    // Animal Interaction Info
+    animalInteraction: {
+        deer: {
+            name: '🦌 Rusa Hutan',
+            description: 'Rusa adalah mamalia herbivora yang hidup berkelompok. Mereka memiliki peran penting dalam menjaga keseimbangan ekosistem hutan.',
+            fact: 'Tahukah kamu? Tanduk rusa jantan bisa tumbuh hingga 1 cm per hari!'
+        },
+        butterfly: {
+            name: '🦋 Kupu-kupu',
+            description: 'Kupu-kupu adalah serangga penyerbuk yang penting untuk reproduksi tanaman berbunga.',
+            fact: 'Kupu-kupu bisa melihat warna ultraviolet yang tidak terlihat oleh mata manusia.'
+        },
+        firefly: {
+            name: '✨ Kunang-kunang',
+            description: 'Kunang-kunang menghasilkan cahaya melalui proses bioluminesensi di perut mereka.',
+            fact: 'Kunang-kunang menggunakan pola cahaya unik untuk berkomunikasi dan mencari pasangan.'
+        }
+    },
+
+    // Wildlife settings
+    wildlife: {
+        position: { x: 0, z: -58 },
+        animals: {
+            deer: { count: 2, spread: 10 },
+            rabbit: { count: 4, spread: 15 },
+            butterfly: { count: 8, spread: 12, heightRange: { min: 1, max: 3 } }
+        }
+    },
+
+    // Deforestation scene settings
+    deforestation: {
+        position: { x: 15, z: -115 },
+        stumps: { count: 8, spread: 15 },
+        fallenTrees: { count: 3, spread: 12 },
+        loggers: { count: 3, spread: 8 },
+        burningTrees: { count: 2, spread: 10 }
+    },
+
+    // Seasonal themes configuration
+    seasonalThemes: {
+        transitionDuration: 2000,
+        seasons: {
+            spring: {
+                fogColor: 0x1a3a1f,
+                clearColor: 0x87ceeb,
+                fogDensity: 0.01,
+                groundColor: 0x2d5a2d,
+                foliageColors: [0x90EE90, 0x98FB98, 0x00FA9A, 0x3CB371],
+                particleColor: 0xFFB7C5,
+                ambientIntensity: 0.6
+            },
+            summer: {
+                fogColor: 0x0a1a0f,
+                clearColor: 0x0a1a0f,
+                fogDensity: 0.015,
+                groundColor: 0x1a3a1f,
+                foliageColors: [0x2d5a3a, 0x3d6a4a, 0x4d7a5a, 0x1d4a2a],
+                particleColor: 0xa8e6cf,
+                ambientIntensity: 0.5
+            },
+            autumn: {
+                fogColor: 0x2a1a0a,
+                clearColor: 0x1a1005,
+                fogDensity: 0.012,
+                groundColor: 0x5a4a2a,
+                foliageColors: [0xFF6347, 0xFFA500, 0xFFD700, 0xDC143C],
+                particleColor: 0xFFA500,
+                ambientIntensity: 0.4
+            },
+            winter: {
+                fogColor: 0xd0e0f0,
+                clearColor: 0x1a2a3a,
+                fogDensity: 0.008,
+                groundColor: 0xe8e8e8,
+                foliageColors: [0x2d4a3a, 0x3d5a4a, 0x1d3a2a, 0x4d5a4a],
+                particleColor: 0xffffff,
+                ambientIntensity: 0.7
+            }
         }
     }
 };

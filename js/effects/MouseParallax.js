@@ -1,7 +1,10 @@
 /**
  * Mouse Parallax Effect - 3D elements react to mouse movement
+ * Reads configuration from config.js for better maintainability
  * @module MouseParallax
  */
+
+import { CONFIG } from '../config.js';
 
 export class MouseParallax {
     constructor(sceneManager) {
@@ -14,8 +17,11 @@ export class MouseParallax {
         this.targetY = 0;
 
         this.enabled = true;
-        this.sensitivity = 0.0005;
-        this.smoothing = 0.05;
+
+        // Load configuration
+        const config = CONFIG.effects?.mouseParallax || {};
+        this.sensitivity = config.sensitivity || 0.0005;
+        this.smoothing = config.smoothing || 0.05;
 
         this.bindEvents();
     }

@@ -1,7 +1,10 @@
 /**
  * Deforestation Scene - Loggers and fallen trees
+ * Reads configuration from config.js for better maintainability
  * @module Deforestation
  */
+
+import { CONFIG } from '../config.js';
 
 export class Deforestation {
     constructor(sceneManager) {
@@ -15,14 +18,21 @@ export class Deforestation {
         this.burningTrees = [];
         this.fireParticles = [];
 
+        // Load configuration from config.js
+        const config = CONFIG.deforestation || {};
+        this.areaPosition = config.position || { x: 15, z: -115 };
+        this.stumpConfig = config.stumps || { count: 8, spread: 15 };
+        this.fallenTreeConfig = config.fallenTrees || { count: 3, spread: 12 };
+        this.loggerConfig = config.loggers || { count: 3, spread: 8 };
+        this.burningTreeConfig = config.burningTrees || { count: 2, spread: 10 };
+
         this.create();
     }
 
     create() {
-        // Position the deforestation area next to the river (river at X:0, Z:-120)
-        // Place it to the right of the river
-        const areaX = 15;
-        const areaZ = -115;
+        const areaX = this.areaPosition.x;
+        const areaZ = this.areaPosition.z;
+
 
         // Create tree stumps (cut trees)
         this.createStumps(areaX, areaZ);

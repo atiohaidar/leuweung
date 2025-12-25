@@ -1,7 +1,10 @@
 /**
  * Magic Particles - Sparkle trail following cursor
+ * Reads configuration from config.js for better maintainability
  * @module MagicParticles
  */
+
+import { CONFIG } from '../config.js';
 
 export class MagicParticles {
     constructor(sceneManager) {
@@ -10,10 +13,14 @@ export class MagicParticles {
         this.camera = sceneManager.getCamera();
 
         this.particles = [];
-        this.maxParticles = 50;
         this.mouseX = 0;
         this.mouseY = 0;
         this.enabled = true;
+
+        // Load configuration
+        const config = CONFIG.effects?.magicParticles || {};
+        this.maxParticles = config.maxParticles || 50;
+        this.colors = config.colors || [0xffff88, 0x88ffff, 0xff88ff, 0x88ff88, 0xffffff];
 
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
@@ -54,10 +61,9 @@ export class MagicParticles {
         );
 
         // Create sparkle
-        const colors = [0xffff88, 0x88ffff, 0xff88ff, 0x88ff88, 0xffffff];
         const geometry = new THREE.SphereGeometry(0.03 + Math.random() * 0.05, 8, 8);
         const material = new THREE.MeshBasicMaterial({
-            color: colors[Math.floor(Math.random() * colors.length)],
+            color: this.colors[Math.floor(Math.random() * this.colors.length)],
             transparent: true,
             opacity: 1
         });

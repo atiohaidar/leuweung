@@ -203,12 +203,24 @@ export class SceneManager {
         this.scene.add(object);
     }
 
+    setComposer(composer) {
+        this.composer = composer;
+    }
+
     render() {
-        this.renderer.render(this.scene, this.camera);
+        if (this.composer) {
+            this.composer.render();
+        } else {
+            this.renderer.render(this.scene, this.camera);
+        }
     }
 
     getScene() {
         return this.scene;
+    }
+
+    getRenderer() {
+        return this.renderer;
     }
 
     getCamera() {

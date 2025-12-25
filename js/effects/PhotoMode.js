@@ -48,39 +48,12 @@ export class PhotoMode {
         const notification = document.createElement('div');
         notification.className = 'photo-notification';
         notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 30px;
-            background: rgba(168, 230, 207, 0.9);
-            color: #0a1a0f;
-            border-radius: 30px;
-            font-weight: 600;
-            z-index: 1000;
-            animation: fadeInOut 2s ease forwards;
-        `;
-
-        // Add animation keyframes if not exists
-        if (!document.querySelector('#photo-mode-styles')) {
-            const style = document.createElement('style');
-            style.id = 'photo-mode-styles';
-            style.textContent = `
-                @keyframes fadeInOut {
-                    0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-                    20% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                    80% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                    100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-                }
-            `;
-            document.head.appendChild(style);
-        }
+        // Styles are handled in controls.css
 
         document.body.appendChild(notification);
 
         setTimeout(() => {
             notification.remove();
-        }, 2000);
+        }, 3000); // Increased duration slightly for better visibility
     }
 }

@@ -71,20 +71,7 @@ export class SectionTitles3D {
 
     createTitleGroup(data) {
         const group = new THREE.Group();
-
-        // Main title text
-        const titleGeometry = new THREE.TextGeometry(data.title, {
-            font: this.font,
-            size: 2.5,
-            height: 1.5,
-            curveSegments: 12,
-            bevelEnabled: true,
-            bevelThickness: 0.15,
-            bevelSize: 0.05,
-            bevelSegments: 5
-        });
-        titleGeometry.computeBoundingBox();
-        titleGeometry.center();
+        group.letters = []; // Store separate letter meshes
 
         const titleMaterial = new THREE.MeshStandardMaterial({
             color: data.color,
@@ -97,27 +84,9 @@ export class SectionTitles3D {
             depthWrite: false
         });
 
-        const titleMesh = new THREE.Mesh(titleGeometry, titleMaterial);
-        titleMesh.position.y = 1.5;
-        group.add(titleMesh);
-
-        // Subtitle text
-        const subtitleGeometry = new THREE.TextGeometry(data.subtitle, {
-            font: this.font,
-            size: 1.2,
-            height: 0.8,
-            curveSegments: 12,
-            bevelEnabled: true,
-            bevelThickness: 0.05,
-            bevelSize: 0.02,
-            bevelSegments: 3
-        });
-        subtitleGeometry.computeBoundingBox();
-        subtitleGeometry.center();
-
         const subtitleMaterial = new THREE.MeshStandardMaterial({
-            color: data.color,
-            emissive: data.emissive,
+            color: 0xffffff,
+            emissive: 0xaaaaaa,
             emissiveIntensity: 0.2,
             metalness: 0.5,
             roughness: 0.3,
@@ -126,9 +95,49 @@ export class SectionTitles3D {
             depthWrite: false
         });
 
-        const subtitleMesh = new THREE.Mesh(subtitleGeometry, subtitleMaterial);
-        subtitleMesh.position.y = -1;
-        group.add(subtitleMesh);
+        // Create main title letters
+        const titleLetters = this.createScatterText(data.title, 2.5, 0.5, titleMaterial, 1.8, 0, data.scale || 1);
+        titleLetters.forEach(mesh => {
+            group.add(mesh);
+            group.letters.push(mesh);
+        });
+
+        // Create subtitle letters if exists
+        if (data.subtitle && data.subtitle.trim() !== '') {
+            const subLetters = this.createScatterText(data.subtitle, 1.2, 0.3, subtitleMaterial, -0.8, 0);
+            subLetters.forEach(mesh => {
+                group.add(mesh);
+                group.letters.push(mesh);
+            });
+        }
+
+        let descriptionMaterial = null;
+        if (data.description) {
+            const descriptionGeometry = new THREE.TextGeometry(data.description, {
+                font: this.font,
+                size: 0.6,
+                height: 0.2,
+                curveSegments: 8,
+                bevelEnabled: false
+            });
+            descriptionGeometry.computeBoundingBox();
+            descriptionGeometry.center();
+
+            descriptionMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffffff, // White for readability
+                emissive: 0xcccccc,
+                emissiveIntensity: 0.1,
+                metalness: 0.3,
+                roughness: 0.4,
+                transparent: true,
+                opacity: 0,
+                depthWrite: false
+            });
+
+            const descriptionMesh = new THREE.Mesh(descriptionGeometry, descriptionMaterial);
+            descriptionMesh.position.y = -2.5; // Position below subtitle
+            group.add(descriptionMesh);
+        }
 
         // Glow light
         const glowLight = new THREE.PointLight(data.emissive, 0, 20);
@@ -140,11 +149,86 @@ export class SectionTitles3D {
         group.userData = {
             titleMaterial,
             subtitleMaterial,
+            descriptionMaterial,
             glowLight,
             initialScale: 1
         };
 
         return group;
+    }
+
+    createScatterText(text, size, height, material, yPos, zPos, scaleMult = 1) {
+        if (!text) return [];
+
+        const finalSize = size * scaleMult;
+        const letters = [];
+        let totalWidth = 0;
+        const spacing = finalSize * 0.15;
+        const geometries = [];
+
+        // Pass 1: Create geometries and calculate width
+        for (const char of text) {
+            if (char === ' ') {
+                totalWidth += finalSize * 0.4;
+                geometries.push(null);
+                continue;
+            }
+            const geo = new THREE.TextGeometry(char, {
+                font: this.font,
+                size: finalSize,
+                height: height,
+                curveSegments: 8,
+                bevelEnabled: true,
+                bevelThickness: 0.05,
+                bevelSize: 0.02,
+                bevelSegments: 3
+            });
+            geo.computeBoundingBox();
+            const width = geo.boundingBox.max.x - geo.boundingBox.min.x;
+            geometries.push({ geo, width });
+            totalWidth += width + spacing;
+        }
+        if (geometries.length > 0) totalWidth -= spacing;
+
+        // Pass 2: Create meshes
+        let currentX = -totalWidth / 2; // Start from left to center
+        geometries.forEach((g) => {
+            if (!g) { // Space
+                currentX += finalSize * 0.4;
+                return;
+            }
+
+            // Center the geometry itself on local origin for rotation
+            g.geo.center();
+
+            const mesh = new THREE.Mesh(g.geo, material);
+            const targetX = currentX + g.width / 2;
+
+            // Setup alignment data
+            mesh.userData = {
+                targetPos: new THREE.Vector3(targetX, yPos, zPos),
+                // Scatter position relative to group center
+                scatterPos: new THREE.Vector3(
+                    targetX + (Math.random() - 0.5) * 20,
+                    yPos + (Math.random() - 0.5) * 20,
+                    zPos + (Math.random() - 0.5) * 15 + 10 // Come from front
+                ),
+                scatterRot: new THREE.Euler(
+                    (Math.random() - 0.5) * Math.PI,
+                    (Math.random() - 0.5) * Math.PI,
+                    (Math.random() - 0.5) * Math.PI
+                )
+            };
+
+            // Start at scattered state
+            mesh.position.copy(mesh.userData.scatterPos);
+            mesh.rotation.copy(mesh.userData.scatterRot);
+
+            letters.push(mesh);
+            currentX += g.width + spacing;
+        });
+
+        return letters;
     }
 
     update() {
@@ -162,7 +246,7 @@ export class SectionTitles3D {
             }
 
             const { group } = section;
-            const { titleMaterial, subtitleMaterial, glowLight } = group.userData;
+            const { titleMaterial, subtitleMaterial, descriptionMaterial, glowLight } = group.userData;
             const { visibilityDistance, flyThroughZone, scaleMultiplier } = this.params;
 
             // Use larger visibility distance for vertical sections (camera moves more in Y)
@@ -181,12 +265,28 @@ export class SectionTitles3D {
                     opacity = eased;
                     scale = 0.6 + (0.4 * eased);
 
+                    // Slide up group (optional, keeping it for extra motion)
                     const slideOffset = (1 - eased) * -3;
                     group.position.y = section.position.y + slideOffset;
 
                     const time = Date.now() * 0.001;
                     sway = Math.sin(time * 0.5 + section.position.z * 0.1) * 0.15 * (1 - eased);
                     group.position.x = section.position.x + sway;
+
+                    // Animate letters assembling
+                    if (group.letters) {
+                        group.letters.forEach(letter => {
+                            const data = letter.userData;
+                            // Use cubic easing for sharper snap
+                            const assembleProgress = this.easeInOutCubic(eased);
+
+                            letter.position.lerpVectors(data.scatterPos, data.targetPos, assembleProgress);
+
+                            letter.rotation.x = data.scatterRot.x * (1 - assembleProgress);
+                            letter.rotation.y = data.scatterRot.y * (1 - assembleProgress);
+                            letter.rotation.z = data.scatterRot.z * (1 - assembleProgress);
+                        });
+                    }
 
                 } else {
                     const flyProgress = 1 - (Math.max(0, dist) / actualFlyThrough);
@@ -201,14 +301,36 @@ export class SectionTitles3D {
 
                     group.position.x = section.position.x;
                     group.position.y = section.position.y;
+
+                    // Animate letters scattering/exploding on exit
+                    if (group.letters) {
+                        group.letters.forEach(letter => {
+                            const data = letter.userData;
+                            // Scatter based on fly progress (as we get closer/pass)
+                            const scatterFactor = this.easeInQuad(flyProgress);
+
+                            letter.position.lerpVectors(data.targetPos, data.scatterPos, scatterFactor);
+
+                            // Rotate wildly again
+                            letter.rotation.x = data.scatterRot.x * scatterFactor;
+                            letter.rotation.y = data.scatterRot.y * scatterFactor;
+                            letter.rotation.z = data.scatterRot.z * scatterFactor;
+                        });
+                    }
                 }
 
                 titleMaterial.opacity = opacity;
                 subtitleMaterial.opacity = opacity;
+                if (descriptionMaterial) {
+                    descriptionMaterial.opacity = opacity;
+                }
 
                 const boost = (scale - 1) * 0.5;
                 titleMaterial.emissiveIntensity = 0.5 + boost;
                 subtitleMaterial.emissiveIntensity = 0.3 + boost;
+                if (descriptionMaterial) {
+                    descriptionMaterial.emissiveIntensity = 0.1 + boost;
+                }
 
                 glowLight.intensity = opacity * (1 + boost);
 
@@ -243,6 +365,10 @@ export class SectionTitles3D {
 
     easeInQuad(t) {
         return t * t;
+    }
+
+    easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     }
 
     /**

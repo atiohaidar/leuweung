@@ -1,7 +1,10 @@
 /**
  * Animal Interaction - Clickable animals with info popups
+ * Reads content from config.js for easier localization and updates
  * @module AnimalInteraction
  */
+
+import { CONFIG } from '../config.js';
 
 export class AnimalInteraction {
     constructor(sceneManager, pointsOfInterest) {
@@ -16,23 +19,8 @@ export class AnimalInteraction {
         this.clickableObjects = [];
         this.popup = null;
 
-        this.animalInfo = {
-            deer: {
-                name: '🦌 Rusa Hutan',
-                description: 'Rusa adalah mamalia herbivora yang hidup berkelompok. Mereka memiliki peran penting dalam menjaga keseimbangan ekosistem hutan.',
-                fact: 'Tahukah kamu? Tanduk rusa jantan bisa tumbuh hingga 1 cm per hari!'
-            },
-            butterfly: {
-                name: '🦋 Kupu-kupu',
-                description: 'Kupu-kupu adalah serangga penyerbuk yang penting untuk reproduksi tanaman berbunga.',
-                fact: 'Kupu-kupu bisa melihat warna ultraviolet yang tidak terlihat oleh mata manusia.'
-            },
-            firefly: {
-                name: '✨ Kunang-kunang',
-                description: 'Kunang-kunang menghasilkan cahaya melalui proses bioluminesensi di perut mereka.',
-                fact: 'Kunang-kunang menggunakan pola cahaya unik untuk berkomunikasi dan mencari pasangan.'
-            }
-        };
+        // Load configuration
+        this.animalInfo = CONFIG.animalInteraction || {};
 
         this.createPopup();
         this.registerClickableObjects();
@@ -42,6 +30,7 @@ export class AnimalInteraction {
     createPopup() {
         this.popup = document.createElement('div');
         this.popup.className = 'animal-popup';
+        // Styles are now handled in CSS (labels.css or controls.css recommended), but keeping inline for now as fallback or moving to CSS later
         this.popup.style.cssText = `
             position: fixed;
             padding: 20px;

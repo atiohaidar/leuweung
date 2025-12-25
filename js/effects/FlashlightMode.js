@@ -1,7 +1,10 @@
 /**
  * Flashlight Mode - Night mode with cursor-following flashlight
+ * Reads configuration from config.js for better maintainability
  * @module FlashlightMode
  */
+
+import { CONFIG } from '../config.js';
 
 export class FlashlightMode {
     constructor(sceneManager) {
@@ -12,8 +15,13 @@ export class FlashlightMode {
 
         this.enabled = false;
         this.flashlight = null;
-        this.originalFogDensity = 0.015;
-        this.originalClearColor = 0x0a1a0f;
+
+        // Load configuration
+        const config = CONFIG.effects?.flashlight || {};
+        this.lightConfig = config;
+
+        this.originalFogDensity = CONFIG.scene.fogDensity;
+        this.originalClearColor = CONFIG.scene.clearColor;
 
         this.mouse = new THREE.Vector2();
         this.raycaster = new THREE.Raycaster();
@@ -24,7 +32,14 @@ export class FlashlightMode {
 
     createFlashlight() {
         // Spotlight as flashlight
-        this.flashlight = new THREE.SpotLight(0xffffee, 3, 30, Math.PI / 6, 0.5, 1);
+        this.flashlight = new THREE.SpotLight(
+            this.lightConfig.color || 0xffffee,
+            this.lightConfig.intensity || 3,
+            this.lightConfig.distance || 30,
+            this.lightConfig.angle || Math.PI / 6,
+            this.lightConfig.penumbra || 0.5,
+            this.lightConfig.decay || 1
+        );
         this.flashlight.position.copy(this.camera.position);
         this.flashlight.visible = false;
         this.scene.add(this.flashlight);
@@ -84,10 +99,10 @@ export class FlashlightMode {
         // Restore lights
         this.scene.children.forEach(child => {
             if (child instanceof THREE.AmbientLight) {
-                child.intensity = 0.5;
+                child.intensity = CONFIG.lighting.ambient.intensity;
             }
             if (child instanceof THREE.DirectionalLight) {
-                child.intensity = 0.8;
+                child.intensity = CONFIG.lighting.sun.intensity;
             }
         });
     }

@@ -1,8 +1,10 @@
 /**
  * Wildlife - Animals near the wildlife section
- * Includes deer, rabbits, and butterflies
+ * Reads configuration from config.js for better maintainability
  * @module Wildlife
  */
+
+import { CONFIG } from '../config.js';
 
 export class Wildlife {
     constructor(sceneManager) {
@@ -10,8 +12,15 @@ export class Wildlife {
         this.scene = sceneManager.getScene();
 
         this.animals = [];
-        // Near KEHIDUPAN LIAR text position
-        this.areaPosition = { x: 0, z: -58 };
+
+        // Load configuration from config.js
+        const config = CONFIG.wildlife || {};
+        this.areaPosition = config.position || { x: 0, z: -58 };
+        this.animalConfig = config.animals || {
+            deer: { count: 2, spread: 10 },
+            rabbit: { count: 4, spread: 15 },
+            butterfly: { count: 8, spread: 12, heightRange: { min: 1, max: 3 } }
+        };
 
         this.createAnimals();
     }
@@ -148,14 +157,17 @@ export class Wildlife {
     createAnimals() {
         const baseX = this.areaPosition.x;
         const baseZ = this.areaPosition.z;
+        const deerConfig = this.animalConfig.deer;
+        const rabbitConfig = this.animalConfig.rabbit;
+        const butterflyConfig = this.animalConfig.butterfly;
 
-        // Create 2 deer
-        for (let i = 0; i < 2; i++) {
+        // Create deer
+        for (let i = 0; i < deerConfig.count; i++) {
             const deer = this.createDeer();
             deer.position.set(
                 baseX + (i === 0 ? -3 : 4),
                 0,
-                baseZ + (Math.random() - 0.5) * 10
+                baseZ + (Math.random() - 0.5) * deerConfig.spread
             );
             deer.rotation.y = Math.random() * Math.PI * 2;
             deer.userData = {
@@ -167,13 +179,13 @@ export class Wildlife {
             this.animals.push(deer);
         }
 
-        // Create 4 rabbits
-        for (let i = 0; i < 4; i++) {
+        // Create rabbits
+        for (let i = 0; i < rabbitConfig.count; i++) {
             const rabbit = this.createRabbit();
             rabbit.position.set(
-                baseX + (Math.random() - 0.5) * 10,
+                baseX + (Math.random() - 0.5) * rabbitConfig.spread,
                 0,
-                baseZ + (Math.random() - 0.5) * 15
+                baseZ + (Math.random() - 0.5) * rabbitConfig.spread
             );
             rabbit.rotation.y = Math.random() * Math.PI * 2;
             rabbit.userData = {
@@ -185,13 +197,15 @@ export class Wildlife {
             this.animals.push(rabbit);
         }
 
-        // Create 8 butterflies
-        for (let i = 0; i < 8; i++) {
+        // Create butterflies
+        const heightRange = butterflyConfig.heightRange || { min: 1, max: 3 };
+        for (let i = 0; i < butterflyConfig.count; i++) {
             const butterfly = this.createButterfly();
+            const baseY = heightRange.min + Math.random() * (heightRange.max - heightRange.min);
             butterfly.position.set(
-                baseX + (Math.random() - 0.5) * 12,
-                1 + Math.random() * 2,
-                baseZ + (Math.random() - 0.5) * 15
+                baseX + (Math.random() - 0.5) * butterflyConfig.spread,
+                baseY,
+                baseZ + (Math.random() - 0.5) * butterflyConfig.spread
             );
             butterfly.userData = {
                 type: 'butterfly',
@@ -234,5 +248,22 @@ export class Wildlife {
                 animal.position.x = data.baseX + Math.sin(time * data.speed * 0.5 + data.phase) * 0.5;
             }
         });
+    }
+
+    /**
+     * Get all animals
+     * @returns {THREE.Group[]} Array of animal groups
+     */
+    getAnimals() {
+        return this.animals;
+    }
+
+    /**
+     * Get animals by type
+     * @param {string} type - 'deer', 'rabbit', or 'butterfly'
+     * @returns {THREE.Group[]} Filtered animals
+     */
+    getAnimalsByType(type) {
+        return this.animals.filter(a => a.userData.type === type);
     }
 }
