@@ -31,7 +31,7 @@ import { AutoScroll } from './effects/AutoScroll.js';
 import { Labels3D } from './effects/Labels3D.js';
 import { SectionTitles3D } from './effects/SectionTitles3D.js';
 import { JumpingFish } from './effects/JumpingFish.js';
-
+import { ObjectInteraction } from './effects/ObjectInteraction.js';
 
 
 /**
@@ -69,7 +69,8 @@ class ForestExperience {
             animalInteraction: null,
             autoScroll: null,
             labels3D: null,
-            sectionTitles3D: null
+            sectionTitles3D: null,
+            objectInteraction: null
         };
 
         this.init();
@@ -137,7 +138,54 @@ class ForestExperience {
         this.effects.labels3D = new Labels3D(sm);
         this.effects.sectionTitles3D = new SectionTitles3D(sm);
         this.effects.jumpingFish = new JumpingFish(sm);
+
+        // Object interaction - must be after labels3D
+        this.effects.objectInteraction = new ObjectInteraction(
+            sm,
+            this.cameraController,
+            this.effects.labels3D
+        );
+
+        // Register clickable objects
+        this.registerClickableObjects();
     }
+
+    /**
+     * Register 3D objects that can be clicked for focus/info
+     * Uses config.js clickableObjects for data-driven registration
+     */
+    registerClickableObjects() {
+        const oi = this.effects.objectInteraction;
+        const poi = this.sceneObjects.pointsOfInterest;
+
+        // Register objects from PointsOfInterest
+        // Maps poi.points[id].object to clickableObjects config by id
+        if (poi && poi.points) {
+            const poiObjects = {};
+            Object.entries(poi.points).forEach(([id, data]) => {
+                if (data.object) {
+                    poiObjects[id] = data.object;
+                }
+            });
+            oi.registerFromSource(poiObjects, 'PointsOfInterest');
+        }
+
+        // Register Deforestation objects
+        // The Deforestation class stores the whole scene, register as single object
+        if (this.sceneObjects.deforestation) {
+            // Get the first stump or machinery as the clickable target
+            const defo = this.sceneObjects.deforestation;
+            if (defo.machinery) {
+                oi.registerClickable(defo.machinery, 'deforestation');
+            }
+        }
+
+        // Register Earth
+        if (this.sceneObjects.earth && this.sceneObjects.earth.earth) {
+            oi.registerClickable(this.sceneObjects.earth.earth, 'earth');
+        }
+    }
+
 
     /**
      * Initialize animation manager and register all updatables

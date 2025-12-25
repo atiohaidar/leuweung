@@ -57,54 +57,6 @@ export class Labels3D {
         return label;
     }
 
-    update() {
-        const scrollProgress = this.sceneManager.getScrollProgress();
-
-        this.labels.forEach(label => {
-            const { min, max } = label.visibleRange;
-            const isVisible = scrollProgress >= min && scrollProgress <= max;
-
-            if (isVisible) {
-                // Calculate visibility intensity (fade in/out at edges)
-                const rangeSize = max - min;
-                const fadeZone = rangeSize * 0.2; // 20% fade zone
-
-                let opacity = 1;
-                if (scrollProgress < min + fadeZone) {
-                    opacity = (scrollProgress - min) / fadeZone;
-                } else if (scrollProgress > max - fadeZone) {
-                    opacity = (max - scrollProgress) / fadeZone;
-                }
-
-                // Project 3D position to 2D screen
-                const screenPos = this.projectToScreen(label.position3D);
-
-                if (screenPos) {
-                    label.element.style.opacity = opacity;
-                    label.element.style.visibility = 'visible';
-
-                    // Position based on side preference
-                    if (label.side === 'center') {
-                        label.element.style.left = '50%';
-                        label.element.style.top = `${Math.min(screenPos.y, 70)}%`;
-                        label.element.style.transform = `translate(-50%, -50%) scale(${0.8 + opacity * 0.2})`;
-                    } else {
-                        // Keep labels in a readable position (not too far off screen)
-                        const clampedX = Math.max(10, Math.min(90, screenPos.x));
-                        const clampedY = Math.max(15, Math.min(85, screenPos.y));
-
-                        label.element.style.left = `${clampedX}%`;
-                        label.element.style.top = `${clampedY}%`;
-                        label.element.style.transform = `translate(-50%, -50%) scale(${0.8 + opacity * 0.2})`;
-                    }
-                }
-            } else {
-                label.element.style.opacity = 0;
-                label.element.style.visibility = 'hidden';
-            }
-        });
-    }
-
     projectToScreen(position3D) {
         const vector = new THREE.Vector3(position3D.x, position3D.y, position3D.z);
 
@@ -171,4 +123,107 @@ export class Labels3D {
             }
         }
     }
+
+    /**
+     * Force show a specific label (ignores scroll position)
+     * Used by ObjectInteraction when clicking on objects
+     * @param {string} id - Label ID to show
+     */
+    forceShowLabel(id) {
+        this.forcedLabelId = id;
+
+        // Hide all other labels and show the forced one
+        this.labels.forEach(label => {
+            if (label.id === id) {
+                label.element.style.opacity = 1;
+                label.element.style.visibility = 'visible';
+                label.element.classList.add('forced-visible');
+
+                // Position in center-right area for focused view
+                label.element.style.left = '75%';
+                label.element.style.top = '50%';
+                label.element.style.transform = 'translate(-50%, -50%) scale(1.1)';
+            } else {
+                label.element.style.opacity = 0;
+                label.element.style.visibility = 'hidden';
+            }
+        });
+    }
+
+    /**
+     * Clear forced label display, resume normal scroll-based visibility
+     */
+    clearForceShow() {
+        this.forcedLabelId = null;
+
+        this.labels.forEach(label => {
+            label.element.classList.remove('forced-visible');
+        });
+    }
+
+    /**
+     * Override update to respect forced label
+     */
+    update() {
+        // If a label is forced, don't do normal scroll-based updates
+        if (this.forcedLabelId) {
+            return;
+        }
+
+        const scrollProgress = this.sceneManager.getScrollProgress();
+
+        this.labels.forEach(label => {
+            const { min, max } = label.visibleRange;
+            const isVisible = scrollProgress >= min && scrollProgress <= max;
+
+            if (isVisible) {
+                // Calculate visibility intensity (fade in/out at edges)
+                const rangeSize = max - min;
+                const fadeZone = rangeSize * 0.2; // 20% fade zone
+
+                let opacity = 1;
+                if (scrollProgress < min + fadeZone) {
+                    opacity = (scrollProgress - min) / fadeZone;
+                } else if (scrollProgress > max - fadeZone) {
+                    opacity = (max - scrollProgress) / fadeZone;
+                }
+
+                // Project 3D position to 2D screen
+                const screenPos = this.projectToScreen(label.position3D);
+
+                if (screenPos) {
+                    label.element.style.opacity = opacity;
+                    label.element.style.visibility = 'visible';
+
+                    // Position based on side preference
+                    if (label.side === 'center') {
+                        label.element.style.left = '50%';
+                        label.element.style.top = `${Math.min(screenPos.y, 70)}%`;
+                        label.element.style.transform = `translate(-50%, -50%) scale(${0.8 + opacity * 0.2})`;
+                    } else {
+                        // Keep labels in a readable position (not too far off screen)
+                        const clampedX = Math.max(10, Math.min(90, screenPos.x));
+                        const clampedY = Math.max(15, Math.min(85, screenPos.y));
+
+                        label.element.style.left = `${clampedX}%`;
+                        label.element.style.top = `${clampedY}%`;
+                        label.element.style.transform = `translate(-50%, -50%) scale(${0.8 + opacity * 0.2})`;
+                    }
+                }
+            } else {
+                label.element.style.opacity = 0;
+                label.element.style.visibility = 'hidden';
+            }
+        });
+    }
+
+    /**
+     * Get label by ID
+     * @param {string} id - Label ID
+     * @returns {Object|null} Label object
+     */
+    getLabelById(id) {
+        return this.labels.find(l => l.id === id) || null;
+    }
 }
+
