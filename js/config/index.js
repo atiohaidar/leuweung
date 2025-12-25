@@ -52,11 +52,35 @@ export const CONFIG = {
         animalInteraction: effectsConfig.animalInteraction
     },
 
+    // Clickable objects for ObjectInteraction
+    clickableObjects: objectsConfig.clickableObjects,
+
     // Animal interaction info
     animalInteraction: contentConfig.animalInfo,
 
     // Seasonal themes
-    seasonalThemes: themesConfig
+    seasonalThemes: themesConfig,
+
+    // Lazy loading configuration
+    lazyLoading: {
+        enabled: true,
+        preloadDistance: 0.1, // Load 10% before visibility
+        objects: {
+            wildlife: { loadAt: 0.20 },
+            deforestation: { loadAt: 0.40 },
+            earth: { loadAt: 0.65 }
+        }
+    },
+
+    // Mobile/touch configuration
+    mobile: {
+        particleReduction: 0.4,  // 40% of desktop particles
+        renderScale: 0.75,       // Lower resolution for performance
+        touchSensitivity: 1.5,
+        enableTouchControls: true,
+        minFOV: 30,
+        maxFOV: 90
+    }
 };
 
 // Also export individual configs for direct access

@@ -19,6 +19,10 @@ import { Wildlife } from './objects/Wildlife.js';
 import { AnimationManager } from './animation/AnimationManager.js';
 import { UIManager } from './ui/UIManager.js';
 
+// Utilities
+import { LazyLoader } from './utils/LazyLoader.js';
+import { getDeviceCapabilities } from './utils/DeviceCapabilities.js';
+
 // Effects
 import { MouseParallax } from './effects/MouseParallax.js';
 import { MagicParticles } from './effects/MagicParticles.js';
@@ -32,6 +36,7 @@ import { Labels3D } from './effects/Labels3D.js';
 import { SectionTitles3D } from './effects/SectionTitles3D.js';
 import { JumpingFish } from './effects/JumpingFish.js';
 import { ObjectInteraction } from './effects/ObjectInteraction.js';
+import { TouchControls } from './effects/TouchControls.js';
 
 
 /**
@@ -40,12 +45,17 @@ import { ObjectInteraction } from './effects/ObjectInteraction.js';
  */
 class ForestExperience {
     constructor() {
+        // Device capabilities detection
+        this.deviceCapabilities = getDeviceCapabilities();
+        this.deviceCapabilities.logInfo();
+
         // Core components
         this.sceneManager = null;
         this.lighting = null;
         this.cameraController = null;
         this.animationManager = null;
         this.uiManager = null;
+        this.lazyLoader = null;
 
         // Scene objects
         this.sceneObjects = {
@@ -55,7 +65,8 @@ class ForestExperience {
             particles: null,
             pointsOfInterest: null,
             earth: null,
-            deforestation: null
+            deforestation: null,
+            wildlife: null
         };
 
         // Effects collection
@@ -70,7 +81,8 @@ class ForestExperience {
             autoScroll: null,
             labels3D: null,
             sectionTitles3D: null,
-            objectInteraction: null
+            objectInteraction: null,
+            touchControls: null
         };
 
         this.init();
@@ -81,6 +93,7 @@ class ForestExperience {
      */
     init() {
         this.initScene();
+        this.initLazyLoader();
         this.initSceneObjects();
         this.initEffects();
         this.initAnimation();
@@ -99,19 +112,69 @@ class ForestExperience {
     }
 
     /**
+     * Initialize lazy loader for deferred object loading
+     */
+    initLazyLoader() {
+        this.lazyLoader = new LazyLoader(this.sceneManager);
+        const lazyConfig = CONFIG.lazyLoading?.objects || {};
+
+        // Register heavy objects for lazy loading
+        if (lazyConfig.wildlife) {
+            this.lazyLoader.register(
+                'wildlife',
+                () => new Wildlife(this.sceneManager),
+                lazyConfig.wildlife.loadAt,
+                (instance) => {
+                    this.sceneObjects.wildlife = instance;
+                    this.animationManager?.register(instance, 'Wildlife');
+                    console.log('🦌 Wildlife loaded via lazy loading');
+                }
+            );
+        }
+
+        if (lazyConfig.deforestation) {
+            this.lazyLoader.register(
+                'deforestation',
+                () => new Deforestation(this.sceneManager),
+                lazyConfig.deforestation.loadAt,
+                (instance) => {
+                    this.sceneObjects.deforestation = instance;
+                    this.animationManager?.register(instance, 'Deforestation');
+                    console.log('🪓 Deforestation loaded via lazy loading');
+                }
+            );
+        }
+
+        if (lazyConfig.earth) {
+            this.lazyLoader.register(
+                'earth',
+                () => new Earth(this.sceneManager),
+                lazyConfig.earth.loadAt,
+                (instance) => {
+                    this.sceneObjects.earth = instance;
+                    this.animationManager?.register(instance, 'Earth');
+                    console.log('🌍 Earth loaded via lazy loading');
+                }
+            );
+        }
+    }
+
+    /**
      * Initialize all 3D scene objects
+     * Heavy objects are deferred to lazy loading
      */
     initSceneObjects() {
         const sm = this.sceneManager;
 
+        // Essential objects - load immediately
         this.sceneObjects.ground = new Ground(sm);
         this.sceneObjects.trees = new Trees(sm);
         this.sceneObjects.fireflies = new Fireflies(sm);
         this.sceneObjects.particles = new Particles(sm);
         this.sceneObjects.pointsOfInterest = new PointsOfInterest(sm);
-        this.sceneObjects.earth = new Earth(sm);
-        this.sceneObjects.deforestation = new Deforestation(sm);
-        this.sceneObjects.wildlife = new Wildlife(sm);
+
+        // Heavy objects are loaded via LazyLoader (wildlife, deforestation, earth)
+        // They will be created when scroll position approaches their visibility
     }
 
     /**
@@ -138,6 +201,12 @@ class ForestExperience {
         this.effects.labels3D = new Labels3D(sm);
         this.effects.sectionTitles3D = new SectionTitles3D(sm);
         this.effects.jumpingFish = new JumpingFish(sm);
+
+        // Touch controls for mobile devices
+        if (this.deviceCapabilities.isTouchDevice) {
+            this.effects.touchControls = new TouchControls(sm);
+            console.log('📱 TouchControls enabled for touch device');
+        }
 
         // Object interaction - must be after labels3D
         this.effects.objectInteraction = new ObjectInteraction(
@@ -194,13 +263,11 @@ class ForestExperience {
         this.animationManager = new AnimationManager(this.sceneManager);
         this.animationManager.setCameraController(this.cameraController);
 
-        // Register scene objects
+        // Register immediately-loaded scene objects
         this.registerUpdatable(this.sceneObjects.trees, 'Trees');
         this.registerUpdatable(this.sceneObjects.fireflies, 'Fireflies');
         this.registerUpdatable(this.sceneObjects.particles, 'Particles');
-        this.registerUpdatable(this.sceneObjects.earth, 'Earth');
-        this.registerUpdatable(this.sceneObjects.deforestation, 'Deforestation');
-        this.registerUpdatable(this.sceneObjects.wildlife, 'Wildlife');
+        // Note: earth, deforestation, wildlife are lazy-loaded and registered via LazyLoader callbacks
 
         // Register effects
         this.registerUpdatable(this.effects.mouseParallax, 'MouseParallax');
@@ -210,6 +277,13 @@ class ForestExperience {
         this.registerUpdatable(this.effects.sectionTitles3D, 'SectionTitles3D');
         this.registerUpdatable(this.effects.jumpingFish, 'JumpingFish');
         this.registerUpdatable(this.effects.labels3D, 'Labels3D');
+        this.registerUpdatable(this.effects.touchControls, 'TouchControls');
+
+        // Add lazy loader update to animation loop
+        this.animationManager.registerHandler('lazyLoader', () => {
+            const progress = this.sceneManager.getScrollProgress();
+            this.lazyLoader.update(progress);
+        });
     }
 
     /**

@@ -116,5 +116,78 @@ export const objectsConfig = {
             sparkleCount: 100,
             flowerScale: { min: 0.5, max: 1.3 }
         }
+    },
+
+    // Clickable Objects - Config-driven object interaction
+    // Add new clickable objects here for ObjectInteraction system
+    clickableObjects: {
+        giantTree: {
+            id: 'giantTree',
+            sourceClass: 'PointsOfInterest',
+            label: {
+                title: '🌳 Pohon Raksasa',
+                description: 'Pohon berusia ratusan tahun yang menjulang tinggi ke langit.',
+                facts: ['Tinggi 60+ meter', 'Usia 500+ tahun', 'Menyerap 22kg CO2/tahun']
+            },
+            camera: {
+                position: { x: -8, y: 5, z: -40 },
+                lookAt: { x: -15, y: 10, z: -50 }
+            }
+        },
+        wildlife: {
+            id: 'wildlife',
+            sourceClass: 'PointsOfInterest',
+            label: {
+                title: '🦋 Kehidupan Liar',
+                description: 'Beragam satwa liar hidup harmonis di ekosistem hutan.',
+                facts: ['2 rusa', '4 kelinci', 'Kupu-kupu']
+            },
+            camera: {
+                position: { x: 15, y: 3, z: -70 },
+                lookAt: { x: 15, y: 1.5, z: -80 }
+            }
+        },
+        river: {
+            id: 'river',
+            sourceClass: 'PointsOfInterest',
+            label: {
+                title: '💧 Sungai Jernih',
+                description: 'Aliran sungai jernih dengan ikan melompat.',
+                facts: ['Air pegunungan', 'Ikan melompat', 'Sumber kehidupan']
+            },
+            camera: {
+                position: { x: 5, y: 2, z: -110 },
+                lookAt: { x: 0, y: 0, z: -130 }
+            }
+        },
+        deforestation: {
+            id: 'deforestation',
+            sourceClass: 'Deforestation',
+            label: {
+                title: '⚠️ Ancaman Nyata',
+                description: 'Area penebangan liar mengancam ekosistem.',
+                facts: ['Jutaan hektar hilang', 'Habitat terancam', 'Perubahan iklim'],
+                theme: 'warning'
+            },
+            camera: {
+                position: { x: 20, y: 4, z: -105 },
+                lookAt: { x: 15, y: 2, z: -115 }
+            }
+        },
+        earth: {
+            id: 'earth',
+            sourceClass: 'Earth',
+            label: {
+                title: '🌍 Bumi Kita',
+                description: 'Lindungi hutan, lindungi bumi.',
+                facts: ['31% daratan bumi', 'Paru-paru dunia', 'Jutaan spesies'],
+                theme: 'cta'
+            },
+            camera: {
+                position: { x: 0, y: 80, z: -130 },
+                lookAt: { x: 0, y: 50, z: -150 }
+            }
+        }
     }
 };
+

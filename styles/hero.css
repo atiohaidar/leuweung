@@ -78,3 +78,48 @@
 .hero-btn:active {
     transform: scale(0.95);
 }
+
+/* Mobile Responsive Hero */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.8rem;
+        letter-spacing: -1px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        padding: 0 20px;
+    }
+
+    .hero-btn {
+        padding: 1rem 2.5rem;
+        font-size: 1rem;
+        min-height: 56px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2.2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+        letter-spacing: 1px;
+    }
+
+    .hero-btn {
+        padding: 0.9rem 2rem;
+        font-size: 0.95rem;
+        width: calc(100% - 40px);
+        max-width: 280px;
+    }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+    #hero-screen {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
