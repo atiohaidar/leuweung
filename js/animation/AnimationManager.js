@@ -85,6 +85,11 @@ export class AnimationManager {
             this.updateButterflies(time);
         }
 
+        // Update 3D labels
+        if (this.objects.labels3D) {
+            this.objects.labels3D.update();
+        }
+
         // Render the scene
         this.sceneManager.render();
     }

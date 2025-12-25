@@ -24,6 +24,8 @@ import { FlashlightMode } from './effects/FlashlightMode.js';
 import { PhotoMode } from './effects/PhotoMode.js';
 import { SeasonalThemes } from './effects/SeasonalThemes.js';
 import { AnimalInteraction } from './effects/AnimalInteraction.js';
+import { AutoScroll } from './effects/AutoScroll.js';
+import { Labels3D } from './effects/Labels3D.js';
 
 class ForestExperience {
     constructor() {
@@ -47,6 +49,8 @@ class ForestExperience {
         this.photoMode = null;
         this.seasonalThemes = null;
         this.animalInteraction = null;
+        this.autoScroll = null;
+        this.labels3D = null;
 
         this.init();
     }
@@ -91,7 +95,8 @@ class ForestExperience {
             mouseParallax: this.mouseParallax,
             magicParticles: this.magicParticles,
             flyingBirds: this.flyingBirds,
-            flashlightMode: this.flashlightMode
+            flashlightMode: this.flashlightMode,
+            labels3D: this.labels3D
         });
 
         // Set camera controller in animation manager
@@ -138,6 +143,12 @@ class ForestExperience {
             this.sceneManager,
             this.pointsOfInterest
         );
+
+        // Auto scroll
+        this.autoScroll = new AutoScroll();
+
+        // 3D Labels
+        this.labels3D = new Labels3D(this.sceneManager);
     }
 
     createControlsPanel() {
