@@ -9,6 +9,8 @@
 /* Component Styles */
 @import url('./components/controls.css');
 @import url('./components/labels.css');
+@import url('./components/info-modal.css');
+@import url('./components/info-card-3d.css');
 
 /* ========================================
    Base Reset

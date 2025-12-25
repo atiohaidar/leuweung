@@ -1,8 +1,11 @@
 /**
  * Animation Manager - Handles the main animation loop
  * Uses a registry pattern for updatable objects (Open/Closed Principle)
+ * OPTIMIZED: Integrated PerformanceMonitor for adaptive quality
  * @module AnimationManager
  */
+
+import { getPerformanceMonitor } from '../utils/PerformanceMonitor.js';
 
 export class AnimationManager {
     constructor(sceneManager) {
@@ -16,7 +19,31 @@ export class AnimationManager {
         // Special handlers that need custom update logic
         this.specialHandlers = new Map();
 
+        // Performance monitoring
+        this.performanceMonitor = getPerformanceMonitor();
+        this.setupPerformanceCallbacks();
+
         this.animate = this.animate.bind(this);
+    }
+
+    /**
+     * Setup callbacks for performance-based quality adjustments
+     */
+    setupPerformanceCallbacks() {
+        this.performanceMonitor.onQualityChange((qualityLevel, fps) => {
+            console.log(`🎮 Quality adjusted to ${Math.round(qualityLevel * 100)}% (FPS: ${fps})`);
+
+            // Notify all updatables that support quality adjustment
+            for (const item of this.updatables) {
+                if (item.object && typeof item.object.setQuality === 'function') {
+                    item.object.setQuality(qualityLevel);
+                }
+            }
+        });
+
+        this.performanceMonitor.onLowFPS((fps, qualityLevel) => {
+            console.warn(`⚠️ Performance warning: ${fps} FPS`);
+        });
     }
 
     /**
@@ -99,6 +126,9 @@ export class AnimationManager {
         if (!this.isRunning) return;
 
         requestAnimationFrame(this.animate);
+
+        // Track FPS for adaptive quality
+        this.performanceMonitor.tick();
 
         const time = Date.now() * 0.001;
 

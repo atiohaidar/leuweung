@@ -28,6 +28,13 @@ export class CameraController {
         this.blendTargetPosition = null;
         this.blendStartLookAt = null;
         this.blendProgress = 0;
+
+        // Subtle interactive look
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.targetLookOffsetX = 0;
+        this.targetLookOffsetY = 0;
+        this.lookOffset = { x: 0, y: 0 };
     }
 
     zoomTo(pointOfInterest, poiName) {
@@ -91,8 +98,8 @@ export class CameraController {
         this.currentPOI = null;
         this.animationStartTime = Date.now();
 
-        // Re-enable scroll-based camera movement
-        this.sceneManager.disableScrollCamera = false;
+        // Keep scroll disabled until blend finishes to prevent conflict
+        // this.sceneManager.disableScrollCamera = false; 
     }
 
     zoomOut() {
@@ -104,7 +111,42 @@ export class CameraController {
             this.updateZoomAnimation();
         } else if (this.isBlendingBack) {
             this.updateBlendBack();
+        } else if (this.isZoomedIn) {
+            this.updateInteractiveLook();
         }
+    }
+
+    setMousePosition(x, y) {
+        // Maps -1 to 1
+        this.mouseX = x;
+        this.mouseY = y;
+    }
+
+    updateInteractiveLook() {
+        if (!this.targetLookAt) return;
+
+        // Calculate target offset (small amount)
+        // Invert X because moving mouse right should rotate view right (which means looking at point to the... wait)
+        // If I look at 0,0,0 and move mouse right, I want to look slightly to the right of the object?
+        // No, usually "parallax" means looking slightly *away* from center to see around it?
+        // Or "looking around" means I rotate the camera.
+        // Let's implement "Follow Cursor": look slightly towards cursor direction.
+        const sensitivity = 0.5; // Max offset in units
+        const targetX = this.mouseX * sensitivity;
+        const targetY = this.mouseY * sensitivity;
+
+        // Smooth interpolation
+        this.lookOffset.x += (targetX - this.lookOffset.x) * 0.1;
+        this.lookOffset.y += (targetY - this.lookOffset.y) * 0.1;
+
+        // Apply to current lookAt
+        const finalLookAt = new THREE.Vector3(
+            this.targetLookAt.x + this.lookOffset.x,
+            this.targetLookAt.y + this.lookOffset.y,
+            this.targetLookAt.z
+        );
+
+        this.camera.lookAt(finalLookAt);
     }
 
     updateZoomAnimation() {
@@ -140,20 +182,27 @@ export class CameraController {
         // Easing
         const eased = this.easeOutCubic(progress);
 
-        // Get current scroll-based target position
-        const scrollTarget = this.sceneManager.getScrollCameraPosition();
+        // Get target state from SceneManager logic (which matches updateCamera now)
+        const targetState = this.sceneManager.getScrollCameraPosition();
+        const targetPos = targetState.position;
+        const targetLook = targetState.lookAt;
 
-        // Blend from stored position to scroll position
-        this.camera.position.x = this.lerp(this.blendStartPosition.x, scrollTarget.x, eased);
-        this.camera.position.y = this.lerp(this.blendStartPosition.y, scrollTarget.y, eased);
-        this.camera.position.z = this.lerp(this.blendStartPosition.z, scrollTarget.z, eased);
+        // Blend positions
+        this.camera.position.x = this.lerp(this.blendStartPosition.x, targetPos.x, eased);
+        this.camera.position.y = this.lerp(this.blendStartPosition.y, targetPos.y, eased);
+        this.camera.position.z = this.lerp(this.blendStartPosition.z, targetPos.z, eased);
 
-        // Blend rotation back to normal (looking forward)
-        this.camera.rotation.x = this.lerp(this.camera.rotation.x, scrollTarget.rotationX, eased);
-        this.camera.rotation.y = this.lerp(this.camera.rotation.y, scrollTarget.rotationY, eased);
+        // Blend lookAt targets
+        this.currentLookAt.x = this.lerp(this.blendStartLookAt.x, targetLook.x, eased);
+        this.currentLookAt.y = this.lerp(this.blendStartLookAt.y, targetLook.y, eased);
+        this.currentLookAt.z = this.lerp(this.blendStartLookAt.z, targetLook.z, eased);
+
+        this.camera.lookAt(this.currentLookAt);
 
         if (progress >= 1) {
             this.isBlendingBack = false;
+            // Now safe to give control back to SceneManager
+            this.sceneManager.disableScrollCamera = false;
         }
     }
 

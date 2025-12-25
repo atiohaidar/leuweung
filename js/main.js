@@ -1,6 +1,6 @@
 /**
  * Main Entry Point - Initializes and orchestrates the 3D Forest Scene
- * Refactored for better maintainability with separated concerns
+ * Refactored for better maintainability (v2.0)
  * @module main
  */
 
@@ -13,15 +13,18 @@ import { Trees } from './objects/Trees.js';
 import { Fireflies } from './objects/Fireflies.js';
 import { Particles } from './objects/Particles.js';
 import { PointsOfInterest } from './objects/PointsOfInterest.js';
-import { Earth } from './objects/Earth.js';
-import { Deforestation } from './objects/Deforestation.js';
-import { Wildlife } from './objects/Wildlife.js';
 import { AnimationManager } from './animation/AnimationManager.js';
 import { UIManager } from './ui/UIManager.js';
 
+// Setup Modules
+import { ClickableRegistry } from './setup/ClickableRegistry.js';
+import { LazyLoadingSetup } from './setup/LazyLoadingSetup.js';
+
 // Utilities
+import { Logger } from './utils/Logger.js';
 import { LazyLoader } from './utils/LazyLoader.js';
 import { getDeviceCapabilities } from './utils/DeviceCapabilities.js';
+import { getFPSDisplay } from './utils/FPSDisplay.js';
 
 // Effects
 import { MouseParallax } from './effects/MouseParallax.js';
@@ -56,6 +59,10 @@ class ForestExperience {
         this.animationManager = null;
         this.uiManager = null;
         this.lazyLoader = null;
+
+        // Setup helpers
+        this.clickableRegistry = null;
+        this.lazyLoadingSetup = null;
 
         // Scene objects
         this.sceneObjects = {
@@ -93,13 +100,33 @@ class ForestExperience {
      */
     init() {
         this.initScene();
-        this.initLazyLoader();
+
+        // Initialize loaders
+        this.lazyLoader = new LazyLoader(this.sceneManager);
+        this.lazyLoadingSetup = new LazyLoadingSetup(this); // Pass context
+        this.lazyLoadingSetup.init(); // Register deferred objects
+
         this.initSceneObjects();
         this.initEffects();
         this.initAnimation();
         this.initUI();
+        this.initPerformanceMonitor();
         this.setupInteractions();
+
+        // Final clickables registration
+        this.clickableRegistry = new ClickableRegistry(this);
+        this.clickableRegistry.init();
+
         this.start();
+    }
+
+    /**
+     * Initialize performance monitoring tools
+     */
+    initPerformanceMonitor() {
+        // Initialize FPS display (toggle with ` key)
+        this.fpsDisplay = getFPSDisplay();
+        Logger.info('System', 'FPS Display ready (press ` or F3 to show)');
     }
 
     /**
@@ -109,54 +136,6 @@ class ForestExperience {
         this.sceneManager = new SceneManager('forest-canvas');
         this.cameraController = new CameraController(this.sceneManager);
         this.lighting = new Lighting(this.sceneManager);
-    }
-
-    /**
-     * Initialize lazy loader for deferred object loading
-     */
-    initLazyLoader() {
-        this.lazyLoader = new LazyLoader(this.sceneManager);
-        const lazyConfig = CONFIG.lazyLoading?.objects || {};
-
-        // Register heavy objects for lazy loading
-        if (lazyConfig.wildlife) {
-            this.lazyLoader.register(
-                'wildlife',
-                () => new Wildlife(this.sceneManager),
-                lazyConfig.wildlife.loadAt,
-                (instance) => {
-                    this.sceneObjects.wildlife = instance;
-                    this.animationManager?.register(instance, 'Wildlife');
-                    console.log('🦌 Wildlife loaded via lazy loading');
-                }
-            );
-        }
-
-        if (lazyConfig.deforestation) {
-            this.lazyLoader.register(
-                'deforestation',
-                () => new Deforestation(this.sceneManager),
-                lazyConfig.deforestation.loadAt,
-                (instance) => {
-                    this.sceneObjects.deforestation = instance;
-                    this.animationManager?.register(instance, 'Deforestation');
-                    console.log('🪓 Deforestation loaded via lazy loading');
-                }
-            );
-        }
-
-        if (lazyConfig.earth) {
-            this.lazyLoader.register(
-                'earth',
-                () => new Earth(this.sceneManager),
-                lazyConfig.earth.loadAt,
-                (instance) => {
-                    this.sceneObjects.earth = instance;
-                    this.animationManager?.register(instance, 'Earth');
-                    console.log('🌍 Earth loaded via lazy loading');
-                }
-            );
-        }
     }
 
     /**
@@ -172,9 +151,6 @@ class ForestExperience {
         this.sceneObjects.fireflies = new Fireflies(sm);
         this.sceneObjects.particles = new Particles(sm);
         this.sceneObjects.pointsOfInterest = new PointsOfInterest(sm);
-
-        // Heavy objects are loaded via LazyLoader (wildlife, deforestation, earth)
-        // They will be created when scroll position approaches their visibility
     }
 
     /**
@@ -205,56 +181,17 @@ class ForestExperience {
         // Touch controls for mobile devices
         if (this.deviceCapabilities.isTouchDevice) {
             this.effects.touchControls = new TouchControls(sm);
-            console.log('📱 TouchControls enabled for touch device');
+            Logger.info('System', 'TouchControls enabled for touch device');
         }
 
         // Object interaction - must be after labels3D
         this.effects.objectInteraction = new ObjectInteraction(
             sm,
             this.cameraController,
-            this.effects.labels3D
+            this.effects.labels3D,
+            this.effects.mouseParallax
         );
-
-        // Register clickable objects
-        this.registerClickableObjects();
     }
-
-    /**
-     * Register 3D objects that can be clicked for focus/info
-     * Uses config.js clickableObjects for data-driven registration
-     */
-    registerClickableObjects() {
-        const oi = this.effects.objectInteraction;
-        const poi = this.sceneObjects.pointsOfInterest;
-
-        // Register objects from PointsOfInterest
-        // Maps poi.points[id].object to clickableObjects config by id
-        if (poi && poi.points) {
-            const poiObjects = {};
-            Object.entries(poi.points).forEach(([id, data]) => {
-                if (data.object) {
-                    poiObjects[id] = data.object;
-                }
-            });
-            oi.registerFromSource(poiObjects, 'PointsOfInterest');
-        }
-
-        // Register Deforestation objects
-        // The Deforestation class stores the whole scene, register as single object
-        if (this.sceneObjects.deforestation) {
-            // Get the first stump or machinery as the clickable target
-            const defo = this.sceneObjects.deforestation;
-            if (defo.machinery) {
-                oi.registerClickable(defo.machinery, 'deforestation');
-            }
-        }
-
-        // Register Earth
-        if (this.sceneObjects.earth && this.sceneObjects.earth.earth) {
-            oi.registerClickable(this.sceneObjects.earth.earth, 'earth');
-        }
-    }
-
 
     /**
      * Initialize animation manager and register all updatables
@@ -267,7 +204,6 @@ class ForestExperience {
         this.registerUpdatable(this.sceneObjects.trees, 'Trees');
         this.registerUpdatable(this.sceneObjects.fireflies, 'Fireflies');
         this.registerUpdatable(this.sceneObjects.particles, 'Particles');
-        // Note: earth, deforestation, wildlife are lazy-loaded and registered via LazyLoader callbacks
 
         // Register effects
         this.registerUpdatable(this.effects.mouseParallax, 'MouseParallax');
@@ -332,7 +268,6 @@ class ForestExperience {
             });
         });
     }
-
 
     /**
      * Start the experience

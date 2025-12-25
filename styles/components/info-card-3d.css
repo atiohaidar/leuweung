@@ -1,0 +1,212 @@
+/* ========================================
+   3D Info Card - Floating info similar to modal but attached to object
+   ======================================== */
+
+.info-card-3d {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 380px;
+    max-width: 90vw;
+    background: linear-gradient(135deg,
+            rgba(20, 40, 30, 0.95) 0%,
+            rgba(15, 30, 20, 0.98) 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(168, 230, 207, 0.3);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(168, 230, 207, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 0;
+    color: #fff;
+    pointer-events: auto;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -50%) scale(0.9);
+    transition:
+        opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 9000;
+}
+
+.info-card-3d.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Header */
+.info-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px 16px;
+    background: linear-gradient(135deg,
+            rgba(168, 230, 207, 0.15) 0%,
+            rgba(168, 230, 207, 0.05) 100%);
+    border-bottom: 1px solid rgba(168, 230, 207, 0.2);
+    border-radius: 20px 20px 0 0;
+}
+
+.info-card-emoji {
+    font-size: 42px;
+    line-height: 1;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    animation: float-mini 3s ease-in-out infinite;
+}
+
+@keyframes float-mini {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+.info-card-titles {
+    flex: 1;
+}
+
+.info-card-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 2px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.info-card-latin {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: rgba(168, 230, 207, 0.8);
+    margin: 0;
+}
+
+/* Body */
+.info-card-body {
+    padding: 20px 24px 24px;
+}
+
+.info-card-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 20px;
+}
+
+/* Facts (Compact) */
+.info-card-facts {
+    background: rgba(168, 230, 207, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(168, 230, 207, 0.15);
+}
+
+.info-card-facts h4 {
+    margin: 0 0 10px;
+    font-size: 0.95rem;
+    color: var(--color-primary, #a8e6cf);
+    font-weight: 600;
+}
+
+.info-card-facts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-card-facts-list li {
+    position: relative;
+    padding: 6px 0 6px 24px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    border-bottom: 1px solid rgba(168, 230, 207, 0.1);
+}
+
+.info-card-facts-list li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-card-facts-list li::before {
+    content: '💡';
+    position: absolute;
+    left: 0;
+    font-size: 0.8rem;
+    top: 6px;
+}
+
+/* Meta Grid */
+.info-card-meta {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.info-card-meta-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid rgba(168, 230, 207, 0.1);
+}
+
+.meta-label {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 4px;
+}
+
+.meta-value {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-primary, #a8e6cf);
+}
+
+/* Theme support */
+.info-card-3d.theme-warning {
+    border-color: rgba(255, 180, 100, 0.4);
+}
+
+.info-card-3d.theme-warning .info-card-header {
+    background: linear-gradient(135deg, rgba(255, 180, 100, 0.2) 0%, rgba(255, 150, 80, 0.1) 100%);
+}
+
+.info-card-3d.theme-warning .info-card-name,
+.info-card-3d.theme-warning .meta-value,
+.info-card-3d.theme-warning .info-card-facts h4 {
+    color: #ffb464;
+}
+
+/* Connecting line design */
+.info-card-connector {
+    position: absolute;
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(to top, rgba(168, 230, 207, 0), #a8e6cf);
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.6;
+}
+
+.info-card-connector::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    background: #a8e6cf;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #a8e6cf;
+}

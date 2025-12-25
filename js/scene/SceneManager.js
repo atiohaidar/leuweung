@@ -1,9 +1,12 @@
 /**
  * Scene Manager - Handles Three.js scene setup and rendering
+ * OPTIMIZED: Device-aware renderer settings and throttled events
  * @module SceneManager
  */
 
 import { CONFIG } from '../config.js';
+import { getDeviceCapabilities } from '../utils/DeviceCapabilities.js';
+import { rafThrottle } from '../utils/Throttle.js';
 
 export class SceneManager {
     constructor(canvasId) {
@@ -11,8 +14,16 @@ export class SceneManager {
         this.scene = null;
         this.camera = null;
         this.renderer = null;
-        this.scrollProgress = 0;
+
+        // Smooth scroll damping system
+        this.targetScrollProgress = 0;      // Target from actual scroll
+        this.scrollProgress = 0;            // Smoothed current value (used by camera)
+        this.scrollSmoothness = CONFIG.camera?.scrollSmoothness || 0.08; // From config
+
         this.disableScrollCamera = false;
+
+        // Device capabilities for optimization
+        this.deviceCaps = getDeviceCapabilities();
 
         this.init();
         this.bindEvents();
@@ -39,41 +50,82 @@ export class SceneManager {
             CONFIG.camera.initialPosition.z
         );
 
-        // Renderer Setup
+        // OPTIMIZED: Renderer Setup based on device capabilities
+        const performanceSettings = this.deviceCaps.performanceSettings;
+
         this.renderer = new THREE.WebGLRenderer({
             canvas: this.canvas,
-            antialias: true,
-            alpha: true
+            antialias: performanceSettings.antialias, // Disable on low-end
+            alpha: true,
+            powerPreference: 'high-performance', // Request high-performance GPU
+            stencil: false, // Disable if not needed
+            depth: true
         });
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Cap pixel ratio for performance (max 1.5 on mobile, 2 otherwise)
+        const maxPixelRatio = this.deviceCaps.isMobile ? 1.5 : 2;
+        const pixelRatio = Math.min(window.devicePixelRatio, maxPixelRatio);
+
+        // Apply render scale for low-end devices
+        const renderScale = performanceSettings.renderScale;
+        const scaledWidth = Math.floor(window.innerWidth * renderScale);
+        const scaledHeight = Math.floor(window.innerHeight * renderScale);
+
+        this.renderer.setSize(scaledWidth, scaledHeight, false);
+        this.canvas.style.width = window.innerWidth + 'px';
+        this.canvas.style.height = window.innerHeight + 'px';
+        this.renderer.setPixelRatio(pixelRatio);
         this.renderer.setClearColor(CONFIG.scene.clearColor, 1);
+
+        // Store render scale for resize
+        this.renderScale = renderScale;
+
+        console.log(`🎮 Renderer initialized: ${scaledWidth}x${scaledHeight}, pixelRatio: ${pixelRatio}, antialias: ${performanceSettings.antialias}`);
     }
 
     bindEvents() {
-        window.addEventListener('resize', () => this.onWindowResize());
-        window.addEventListener('scroll', () => this.onScroll());
+        // OPTIMIZED: Debounce resize, throttle scroll with RAF
+        window.addEventListener('resize', rafThrottle(() => this.onWindowResize()));
+        window.addEventListener('scroll', rafThrottle(() => this.onScroll()), { passive: true });
     }
 
     onWindowResize() {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // Apply render scale on resize
+        const scaledWidth = Math.floor(window.innerWidth * this.renderScale);
+        const scaledHeight = Math.floor(window.innerHeight * this.renderScale);
+
+        this.renderer.setSize(scaledWidth, scaledHeight, false);
+        this.canvas.style.width = window.innerWidth + 'px';
+        this.canvas.style.height = window.innerHeight + 'px';
     }
 
     onScroll() {
         const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-        this.scrollProgress = window.scrollY / scrollable;
+        // Set TARGET scroll progress (actual scroll position)
+        this.targetScrollProgress = window.scrollY / scrollable;
 
-        // Update progress bar
+        // Update progress bar immediately (no need to smooth this)
         const progressBar = document.getElementById('progress-bar');
         if (progressBar) {
-            progressBar.style.width = (this.scrollProgress * 100) + '%';
+            progressBar.style.width = (this.targetScrollProgress * 100) + '%';
         }
     }
 
     updateCamera(time) {
         if (this.disableScrollCamera) return;
+
+        // Smooth interpolation: camera "chases" the target scroll position
+        // This eliminates jerky movement when scrolling quickly
+        const delta = this.targetScrollProgress - this.scrollProgress;
+        this.scrollProgress += delta * this.scrollSmoothness;
+
+        // Snap to target when very close (avoid endless micro-movements)
+        if (Math.abs(delta) < 0.0001) {
+            this.scrollProgress = this.targetScrollProgress;
+        }
 
         const progress = this.scrollProgress;
 
@@ -235,38 +287,105 @@ export class SceneManager {
     getScrollCameraPosition() {
         const progress = this.scrollProgress;
         const time = Date.now() * 0.001;
-        let x, y, z, rotationX, rotationY;
+        let x, y, z;
+        let lookAtX, lookAtY, lookAtZ;
 
-        if (progress < 0.75) {
-            // Normal forest exploration
-            const forestProgress = progress / 0.75;
+        if (progress < 0.55) {
+            // Phase 1: Normal forest exploration (0% - 55%)
+            const forestProgress = progress / 0.55;
 
-            z = CONFIG.camera.initialPosition.z - forestProgress * CONFIG.camera.maxScrollZ;
+            z = CONFIG.camera.initialPosition.z - forestProgress * (CONFIG.camera.maxScrollZ * 0.7);
             y = CONFIG.camera.initialPosition.y + Math.sin(forestProgress * Math.PI * 2) * 1;
+
+            // Slight camera sway
             x = Math.sin(time * CONFIG.camera.swaySpeed) * CONFIG.camera.swayAmount;
-            rotationX = 0;
-            rotationY = Math.sin(time * 0.2) * 0.02;
+
+            // Calculate lookAt for Phase 1 (mainly forward with slight sway)
+            // Equivalent to rotation.y = Math.sin(time * 0.2) * 0.02
+            const rotY = Math.sin(time * 0.2) * 0.02;
+            lookAtX = x + Math.sin(rotY) * 10;
+            lookAtY = y;
+            lookAtZ = z - 10;
+
+        } else if (progress < 0.75) {
+            // Phase 2: Deforestation focus (55% - 75%)
+            const deforestProgress = (progress - 0.55) / 0.20;
+            const eased = this.easeInOutCubic(deforestProgress);
+
+            const startZ = CONFIG.camera.initialPosition.z - (CONFIG.camera.maxScrollZ * 0.7);
+            const startY = CONFIG.camera.initialPosition.y;
+            const startX = 0;
+
+            const targetZ = -100;
+            const targetY = 10;
+            const targetX = 5;
+
+            z = this.lerp(startZ, targetZ, eased);
+            y = this.lerp(startY, targetY, eased);
+            x = this.lerp(startX, targetX, eased);
+
+            // Look at deforestation scene
+            const lookForwardX = 0;
+            const lookForwardY = startY;
+            const lookForwardZ = startZ - 30;
+
+            const lookAtDefoX = 15;
+            const lookAtDefoY = 1;
+            const lookAtDefoZ = -115;
+
+            lookAtX = this.lerp(lookForwardX, lookAtDefoX, eased);
+            lookAtY = this.lerp(lookForwardY, lookAtDefoY, eased);
+            lookAtZ = this.lerp(lookForwardZ, lookAtDefoZ, eased);
+
         } else {
-            // Earth zoom out phase
+            // Phase 3: Earth zoom out (75% - 100%)
             const earthProgress = (progress - 0.75) / 0.25;
             const eased = this.easeInOutCubic(earthProgress);
 
-            const startZ = CONFIG.camera.initialPosition.z - CONFIG.camera.maxScrollZ;
-            const startY = CONFIG.camera.initialPosition.y;
-            const endZ = -180;
-            const endY = 100;
+            const startZ = -100;
+            const startY = 10;
+            const startX = 5;
+
+            const endZ = -140;
+            const endY = 300;
+            const endX = 0;
 
             z = this.lerp(startZ, endZ, eased);
             y = this.lerp(startY, endY, eased);
-            x = this.lerp(
-                Math.sin(time * CONFIG.camera.swaySpeed) * CONFIG.camera.swayAmount,
-                0,
-                eased
-            );
-            rotationX = this.lerp(0, -Math.PI / 3, eased);
-            rotationY = 0;
+            x = this.lerp(startX, endX, eased);
+
+            // Look targets
+            const lookAtDefoX = 15;
+            const lookAtDefoY = 1;
+            const lookAtDefoZ = -115;
+
+            const lookAtEarthX = 0;
+            const lookAtEarthY = -80;
+            const lookAtEarthZ = -150;
+
+            lookAtX = this.lerp(lookAtDefoX, lookAtEarthX, eased);
+            lookAtY = this.lerp(lookAtDefoY, lookAtEarthY, eased);
+            lookAtZ = this.lerp(lookAtDefoZ, lookAtEarthZ, eased);
         }
 
-        return { x, y, z, rotationX, rotationY };
+        return {
+            position: new THREE.Vector3(x, y, z),
+            lookAt: new THREE.Vector3(lookAtX, lookAtY, lookAtZ)
+        };
+    }
+
+    /**
+     * Set camera scroll smoothness (0.01 = very smooth, 0.2 = responsive)
+     * Default: 0.08
+     */
+    setScrollSmoothness(value) {
+        this.scrollSmoothness = Math.max(0.01, Math.min(0.3, value));
+    }
+
+    /**
+     * Get the target (actual) scroll progress (before smoothing)
+     */
+    getTargetScrollProgress() {
+        return this.targetScrollProgress;
     }
 }

@@ -20,6 +20,8 @@ export const sceneConfig = {
         maxScrollZ: 180,
         swayAmount: 0.5,
         swaySpeed: 0.3,
+        // Scroll smoothing (0.01 = very smooth/cinematic, 0.2 = responsive)
+        scrollSmoothness: 0.08,
         // Camera phases for scroll
         phases: {
             forest: { end: 0.55 },

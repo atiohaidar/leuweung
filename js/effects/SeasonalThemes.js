@@ -106,19 +106,9 @@ export class SeasonalThemes {
                 this.ground.mesh.material.color = groundColor;
             }
 
-            // Transition tree foliage colors
-            if (this.trees && this.trees.trees) {
-                this.trees.trees.forEach((tree, index) => {
-                    tree.children.forEach((child, i) => {
-                        if (child.material && child.material.color && i > 0) {
-                            const currentColor = child.material.color;
-                            const targetColor = new THREE.Color(
-                                config.foliageColors[i % config.foliageColors.length]
-                            );
-                            currentColor.lerp(targetColor, eased * 0.05);
-                        }
-                    });
-                });
+            // Transition tree foliage colors (InstancedMesh compatible)
+            if (this.trees && this.trees.updateFoliageColors) {
+                this.trees.updateFoliageColors(config.foliageColors, eased * 0.05);
             }
 
             if (progress < 1) {

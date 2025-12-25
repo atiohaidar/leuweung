@@ -80,6 +80,16 @@ export const CONFIG = {
         enableTouchControls: true,
         minFOV: 30,
         maxFOV: 90
+    },
+
+    // Performance monitoring configuration
+    performance: {
+        targetFPS: 55,           // Target FPS to maintain
+        criticalFPS: 30,         // FPS threshold for aggressive quality reduction
+        checkInterval: 2000,     // How often to check FPS (ms)
+        qualityChangeDelay: 3000, // Minimum time between quality changes (ms)
+        minQuality: 0.3,         // Minimum quality level (30%)
+        enableAdaptive: true     // Enable adaptive quality system
     }
 };
 
