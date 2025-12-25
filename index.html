@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forest Journey - 3D Experience</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Memuat Hutan...</p>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container">
+        <canvas id="forest-canvas"></canvas>
+    </div>
+
+    <!-- Fog Overlay -->
+    <div class="fog-overlay"></div>
+
+    <!-- Content Sections -->
+    <div class="content">
+        <!-- Hero Section -->
+        <section class="section hero">
+            <h1>🌲 Hayu Ka Leuweung</h1>
+            <p>Duka di leuweung aya naon wae, hayu atuh meh teu panasaran awikwok</p>
+            <div class="scroll-indicator">
+                <span></span>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="section feature-section">
+            <h2>🌿 Aya Naon wae di leuweung</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon">🌳</div>
+                    <h3>Pohon Raksasa</h3>
+                    <p>Temukan pohon-pohon berusia ratusan tahun yang menjulang tinggi ke langit.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🦋</div>
+                    <h3>Kehidupan Liar</h3>
+                    <p>Saksikan beragam satwa liar yang hidup harmonis di ekosistem hutan.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">💧</div>
+                    <h3>Sungai Jernih</h3>
+                    <p>Ikuti aliran sungai yang mengalir jernih di antara pepohonan.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wildlife Section -->
+        <section class="section wildlife-section">
+            <h2>Masya Allah</h2>
+            <p>Hutan adalah rumah bagi jutaan spesies. Dari serangga terkecil hingga mamalia terbesar, setiap makhluk
+                memiliki peran penting dalam menjaga keseimbangan ekosistem. Mari kita jaga keindahan ini untuk generasi
+                mendatang.</p>
+        </section>
+
+        <!-- Deforestation Section -->
+        <section class="section deforestation-section">
+            <h2>⚠️ Ancaman Nyata</h2>
+            <p>Setiap tahun, jutaan hektar hutan hilang akibat penebangan liar dan alih fungsi lahan.
+                Kehilangan hutan berarti kehilangan rumah bagi satwa liar, sumber air bersih, dan paru-paru dunia.</p>
+            <div class="stat-cards">
+                <div class="stat-card">
+                    <span class="stat-number">10 juta</span>
+                    <span class="stat-label">Hektar hutan hilang/tahun</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">80%</span>
+                    <span class="stat-label">Spesies darat tinggal di hutan</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="section cta-section">
+            <h2>🌍 Lindungi Bumi Kita</h2>
+            <p>Bergabunglah dalam gerakan pelestarian hutan</p>
+            <a href="#" class="cta-button">Tombolnya belum guna</a>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Bukan yang suka nge claim credit</p>
+    </footer>
+
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Main Application (ES Modules) -->
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>
